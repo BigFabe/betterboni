@@ -134,8 +134,11 @@
     <string name="class_middle_east">Nahöstlich</string>
     <string name="class_local">Mitteleuropäisch</string>
     <string name="class_mixed">Internationale Auswahl</string>
-    <string name="speech_missing_voice">Slowenische Stimme fehlt</string>
-    <string name="speech_install_slovenian">Installiere oder aktiviere eine slowenische Stimme in der Android-Sprachausgabe, um die Originalaussprache zu hören.</string>
-    <string name="speech_settings">Spracheinstellungen</string>
-    <string name="speech_failed">Vorlesen fehlgeschlagen. Prüfe die Android-Einstellungen zur Sprachausgabe.</string>
+    <string name="speech_section">Aussprache</string>
+    <string name="speech_model">Vorlese-Modell (Gemini TTS)</string>
+    <string name="speech_loading">Aussprache wird geladen…</string>
+    <string name="speech_key_required">OpenRouter-API-Key in den Einstellungen eintragen.</string>
+    <string name="speech_model_required">Vorlese-Modell in den Einstellungen eintragen.</string>
+    <string name="speech_playback_failed">Audio konnte nicht abgespielt werden.</string>
+    <string name="speech_failed">Aussprache: %1$s</string>
 </resources>

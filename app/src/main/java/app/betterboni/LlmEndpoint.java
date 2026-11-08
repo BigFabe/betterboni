@@ -71,6 +71,16 @@ final class LlmEndpoint {
     }
 
     JSONObject post(JSONObject request) throws Exception {
+        JSONObject payload = new JSONObject(new String(send(request, false), StandardCharsets.UTF_8));
+        if (payload.has("error")) throw new IOException(safeMessage(errorMessage(payload)));
+        return payload;
+    }
+
+    byte[] postAudio(JSONObject request) throws Exception {
+        return send(request, true);
+    }
+
+    private byte[] send(JSONObject request, boolean audio) throws Exception {
         URI endpoint;
         try { endpoint = new URI(url); }
         catch (Exception error) { throw new IOException(message("Enter a valid LLM endpoint URL.", "Gültige LLM-Endpoint-URL eintragen.")); }
@@ -87,7 +97,7 @@ final class LlmEndpoint {
         connection.setReadTimeout(90000);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-        connection.setRequestProperty("Accept", "application/json");
+        connection.setRequestProperty("Accept", audio ? "audio/*" : "application/json");
         if (!apiKey.isEmpty()) connection.setRequestProperty("Authorization", "Bearer " + apiKey);
         connection.setDoOutput(true);
         connection.setFixedLengthStreamingMode(body.length);
@@ -95,19 +105,20 @@ final class LlmEndpoint {
             try (java.io.OutputStream output = connection.getOutputStream()) { output.write(body); }
             int status = connection.getResponseCode();
             if (status < 200 || status >= 300) throw httpError(connection, status);
-            String response;
+            String contentType = connection.getContentType();
+            if (audio && (contentType == null || !(contentType.startsWith("audio/") || contentType.startsWith("application/octet-stream")))) {
+                throw new IOException(message("The endpoint did not return audio.", "Der Endpoint hat keine Audiodaten zurückgegeben."));
+            }
+            int maxBytes = (audio ? 8 : 2) * 1024 * 1024;
             try (InputStream stream = connection.getInputStream(); ByteArrayOutputStream bytes = new ByteArrayOutputStream()) {
                 byte[] buffer = new byte[8192];
                 int length;
                 while ((length = stream.read(buffer)) != -1) {
-                    if (bytes.size() + length > 2 * 1024 * 1024) throw new IOException(message("LLM response is too large.", "LLM-Antwort ist zu groß."));
+                    if (bytes.size() + length > maxBytes) throw new IOException(message("LLM response is too large.", "LLM-Antwort ist zu groß."));
                     bytes.write(buffer, 0, length);
                 }
-                response = bytes.toString(StandardCharsets.UTF_8.name());
+                return bytes.toByteArray();
             }
-            JSONObject payload = new JSONObject(response);
-            if (payload.has("error")) throw new IOException(safeMessage(errorMessage(payload)));
-            return payload;
         } finally { connection.disconnect(); }
     }
 

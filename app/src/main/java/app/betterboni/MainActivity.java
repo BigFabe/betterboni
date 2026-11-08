@@ -493,6 +493,9 @@ public class MainActivity extends Activity {
             warmClassifications();
         });
         form.addView(classificationStatus);
+        margin(form, text(getString(R.string.speech_section), 16, INK, true), 24, 8);
+        llmField(form, getString(R.string.speech_model), MenuSpeaker.DEFAULT_MODEL,
+                "speechModel", false, MenuSpeaker.DEFAULT_MODEL);
         llmField(form, getString(R.string.shared_api_key), getString(R.string.bearer_token), "llmKeyEncrypted", true);
     }
 
@@ -507,6 +510,7 @@ public class MainActivity extends Activity {
                 getPreferences(MODE_PRIVATE).getString("llmModel", LlmEndpoint.DEFAULT_MODEL), key,
                 getPreferences(MODE_PRIVATE).getString("llmReasoning", ""),
                 getPreferences(MODE_PRIVATE).getString("appLanguage", "en")));
+        menuSpeaker.configure(getPreferences(MODE_PRIVATE).getString("speechModel", MenuSpeaker.DEFAULT_MODEL), key);
     }
 
     private void configureClassification() {
