@@ -690,7 +690,7 @@ public class MainActivity extends Activity {
         visible.clear();
         for (Restaurant item : restaurants) {
             OpeningHours.Status open = availability.getOrDefault(item.id, OpeningHours.Status.UNKNOWN);
-            if (open == OpeningHours.Status.UNKNOWN || (!showClosed && query.isEmpty() && open == OpeningHours.Status.CLOSED)) continue;
+            if (open == OpeningHours.Status.UNKNOWN) continue;
             if (!showWithoutMenu && !Boolean.TRUE.equals(menuAvailability.get(item.id))) continue;
             if (onlyFavorites && !favorites.contains(item.id)) continue;
             if (!item.services.containsAll(selectedServices)) continue;
@@ -699,6 +699,10 @@ public class MainActivity extends Activity {
             if (Double.isFinite(radiusMeters) && (position == null || item.distanceFrom(position) > radiusMeters)) continue;
             if (!Restaurant.searchable(item.name).contains(query)) continue;
             visible.add(item);
+        }
+        if (!showClosed && query.isEmpty()
+                && visible.stream().anyMatch(item -> availability.get(item.id) == OpeningHours.Status.OPEN)) {
+            visible.removeIf(item -> availability.get(item.id) == OpeningHours.Status.CLOSED);
         }
         Comparator<Restaurant> names = Comparator.comparing(r -> Restaurant.searchable(r.name));
         Comparator<Restaurant> order = names;
