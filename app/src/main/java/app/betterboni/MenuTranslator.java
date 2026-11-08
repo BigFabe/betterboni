@@ -34,7 +34,7 @@ final class MenuTranslator implements AutoCloseable {
     private final android.content.res.Resources resources;
     private final String targetLanguage;
     private final TranslationCache cache;
-    private final Translator translator;
+    private Translator translator;
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private final ExecutorService llmNetwork = Executors.newFixedThreadPool(2);
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -55,9 +55,6 @@ final class MenuTranslator implements AutoCloseable {
         this.resources = context.getResources();
         this.targetLanguage = targetLanguage;
         cache = new TranslationCache(this.context);
-        translator = Translation.getClient(new TranslatorOptions.Builder()
-                .setSourceLanguage(TranslateLanguage.SLOVENIAN)
-                .setTargetLanguage(targetLanguage).build());
     }
 
     void configure(boolean custom, LlmEndpoint config) {
@@ -169,6 +166,11 @@ final class MenuTranslator implements AutoCloseable {
     }
 
     private Task<Void> prepareModels(boolean allowMobile) {
+        if (translator == null) {
+            translator = Translation.getClient(new TranslatorOptions.Builder()
+                    .setSourceLanguage(TranslateLanguage.SLOVENIAN)
+                    .setTargetLanguage(targetLanguage).build());
+        }
         if (modelSetup != null && (!modelSetup.isComplete() || modelSetup.isSuccessful())) return modelSetup;
         TaskCompletionSource<Void> setup = new TaskCompletionSource<>();
         modelSetup = setup.getTask();
@@ -209,7 +211,7 @@ final class MenuTranslator implements AutoCloseable {
         generation++;
         main.removeCallbacks(flushLlm);
         for (TaskCompletionSource<String> result : new ArrayList<>(inFlight.values())) result.trySetException(new CancellationException());
-        translator.close();
+        if (translator != null) translator.close();
         llmNetwork.shutdownNow();
         io.execute(cache::close);
         io.shutdown();

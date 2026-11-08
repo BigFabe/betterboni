@@ -110,6 +110,7 @@ public class MainActivity extends Activity {
     private final Map<String, String> hoursSchedules = new LinkedHashMap<>();
     private final Map<String, OpeningHours.Status> availability = new LinkedHashMap<>();
     private final Handler hoursClock = new Handler(Looper.getMainLooper());
+    private final Runnable renderRestaurants = this::filter;
     private final Runnable hoursTick = new Runnable() {
         @Override public void run() {
             hoursSchedules.forEach((id, schedule) -> availability.put(id, OpeningHours.status(schedule)));
@@ -168,7 +169,7 @@ public class MainActivity extends Activity {
         restaurantClassifier = new RestaurantClassifier(this, new RestaurantClassifier.Listener() {
             @Override public void onClassification(String id, List<RestaurantTaxonomy.Tag> labels) {
                 classifications.put(id, labels);
-                adapter.notifyDataSetChanged();
+                scheduleFilter();
             }
             @Override public void onError(String message) {
                 if (classificationError.equals(message)) return;
@@ -186,21 +187,29 @@ public class MainActivity extends Activity {
         });
         configureClassification();
         hoursRepository = new HoursRepository(this, new HoursRepository.Listener() {
+            @Override public void onCached(Map<String, String> schedules, Map<String, Boolean> menus,
+                                           Map<String, OpeningHours.Status> states) {
+                hoursSchedules.putAll(schedules);
+                menuAvailability.putAll(menus);
+                availability.putAll(states);
+                scheduleFilter();
+            }
             @Override public void onHours(String id, String schedule) {
                 if (schedule != null) hoursSchedules.put(id, schedule);
                 else hoursSchedules.remove(id);
                 availability.put(id, OpeningHours.status(schedule));
-                filter();
+                scheduleFilter();
             }
             @Override public void onMenu(String id, Boolean hasMenu, MenuEvidence evidence) {
                 if (hasMenu == null) menuAvailability.remove(id);
                 else menuAvailability.put(id, hasMenu);
                 if (evidence != null) restaurantClassifier.rememberMenu(id, evidence);
-                filter();
+                scheduleFilter();
             }
             @Override public void onLoading(boolean active) {
+                if (hoursLoading == active) return;
                 hoursLoading = active;
-                filter();
+                scheduleFilter();
             }
         });
         favorites = new HashSet<>(getPreferences(MODE_PRIVATE).getStringSet("favorites", java.util.Collections.emptySet()));
@@ -674,6 +683,12 @@ public class MainActivity extends Activity {
         filterButton.setEnabled(true);
         setStatus(message);
         hoursRepository.load(items, position);
+        scheduleFilter();
+    }
+
+    private void scheduleFilter() {
+        hoursClock.removeCallbacks(renderRestaurants);
+        hoursClock.postDelayed(renderRestaurants, 16);
     }
 
     private void filter() {
@@ -689,7 +704,7 @@ public class MainActivity extends Activity {
             if (item.contribution < minPrice || item.contribution > maxPrice) continue;
             if (item.rating < minRating) continue;
             if (Double.isFinite(radiusMeters) && (position == null || item.distanceFrom(position) > radiusMeters)) continue;
-            if (!Restaurant.searchable(item.name).contains(query)) continue;
+            if (!query.isEmpty() && !Restaurant.searchable(item.name).contains(query)) continue;
             visible.add(item);
         }
         if (!showClosed && query.isEmpty()
@@ -1529,6 +1544,7 @@ public class MainActivity extends Activity {
         menuSpeaker.close();
         restaurantClassifier.close();
         hoursClock.removeCallbacks(hoursTick);
+        hoursClock.removeCallbacks(renderRestaurants);
         hoursRepository.close();
         network.shutdownNow();
         super.onDestroy();

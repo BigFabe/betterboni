@@ -18,12 +18,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 final class HoursRepository implements AutoCloseable {
     interface Listener {
+        void onCached(Map<String, String> schedules, Map<String, Boolean> menus, Map<String, OpeningHours.Status> states);
         void onHours(String id, String schedule);
         void onMenu(String id, Boolean hasMenu, MenuEvidence evidence);
         void onLoading(boolean loading);
@@ -53,35 +56,53 @@ final class HoursRepository implements AutoCloseable {
     void load(List<Restaurant> restaurants, Location origin) {
         List<Restaurant> ordered = new ArrayList<>(restaurants);
         ordered.sort(Comparator.comparingDouble(restaurant -> restaurant.distanceFrom(origin)));
-        for (Restaurant restaurant : ordered) {
-            if (!requested.add(restaurant.id)) continue;
-            remaining++;
-            disk.execute(() -> {
-                try (Cursor row = cache.getReadableDatabase().query("hours", new String[]{"schedule", "fetched_at"},
-                        "restaurant_id=?", new String[]{restaurant.id}, null, null, null)) {
-                    if (closed) return;
-                    if (row.moveToFirst()) {
-                        long age = System.currentTimeMillis() - row.getLong(1);
-                        if (age >= 0 && age < MAX_AGE_MS) {
-                            String schedule = row.getString(0);
-                            Boolean hasMenu = cachedMenu(restaurant.id);
-                            if (hasMenu != null) {
-                                finish(restaurant.id, schedule, hasMenu, null);
-                                return;
-                            }
-                            main.post(() -> { if (!closed) listener.onHours(restaurant.id, schedule); });
-                        }
+        ordered.removeIf(restaurant -> !requested.add(restaurant.id));
+        if (ordered.isEmpty()) return;
+        remaining += ordered.size();
+        listener.onLoading(true);
+        disk.execute(() -> {
+            if (closed) return;
+            Map<String, String> schedules = new LinkedHashMap<>();
+            Map<String, Boolean> menus = new LinkedHashMap<>();
+            Map<String, OpeningHours.Status> states = new LinkedHashMap<>();
+            Set<String> ids = new HashSet<>();
+            for (Restaurant restaurant : ordered) ids.add(restaurant.id);
+            long now = System.currentTimeMillis();
+            String day = today();
+            try (Cursor rows = cache.getReadableDatabase().rawQuery(
+                    "SELECT h.restaurant_id, h.schedule, h.fetched_at, m.has_menu, m.fetched_day "
+                            + "FROM hours h LEFT JOIN menu_availability m ON h.restaurant_id=m.restaurant_id", null)) {
+                while (rows.moveToNext()) {
+                    String id = rows.getString(0);
+                    if (!ids.contains(id)) continue;
+                    long age = now - rows.getLong(2);
+                    if (age >= 0 && age < MAX_AGE_MS) {
+                        String schedule = rows.getString(1);
+                        schedules.put(id, schedule);
+                        states.put(id, OpeningHours.status(schedule));
                     }
-                } catch (Exception error) {
-                    android.util.Log.w("BetterBoni", "Opening-hours cache unavailable", error);
+                    if (!rows.isNull(3) && day.equals(rows.getString(4))) menus.put(id, rows.getInt(3) != 0);
                 }
-                if (!closed) {
-                    try { downloads.execute(() -> download(restaurant)); }
-                    catch (java.util.concurrent.RejectedExecutionException ignored) { /* Activity was closed. */ }
-                }
+            } catch (Exception error) {
+                android.util.Log.w("BetterBoni", "Restaurant-details cache unavailable", error);
+            }
+            List<Restaurant> missing = new ArrayList<>();
+            for (Restaurant restaurant : ordered) {
+                if (!schedules.containsKey(restaurant.id) || !menus.containsKey(restaurant.id)) missing.add(restaurant);
+            }
+            int cachedCount = ordered.size() - missing.size();
+            main.post(() -> {
+                if (closed) return;
+                remaining -= cachedCount;
+                listener.onCached(schedules, menus, states);
+                listener.onLoading(remaining > 0);
             });
-        }
-        listener.onLoading(remaining > 0);
+            for (Restaurant restaurant : missing) {
+                if (closed) return;
+                try { downloads.execute(() -> download(restaurant)); }
+                catch (java.util.concurrent.RejectedExecutionException ignored) { /* Activity was closed. */ }
+            }
+        });
     }
 
     private void download(Restaurant restaurant) {
@@ -129,13 +150,6 @@ final class HoursRepository implements AutoCloseable {
     }
 
     private String today() { return LocalDate.now(ZoneId.of("Europe/Ljubljana")).toString(); }
-
-    private Boolean cachedMenu(String id) {
-        try (Cursor row = cache.getReadableDatabase().query("menu_availability", new String[]{"has_menu"},
-                "restaurant_id=? AND fetched_day=?", new String[]{id, today()}, null, null, null)) {
-            return row.moveToFirst() ? row.getInt(0) != 0 : null;
-        }
-    }
 
     private void saveMenu(String id, boolean hasMenu) {
         ContentValues values = new ContentValues();
