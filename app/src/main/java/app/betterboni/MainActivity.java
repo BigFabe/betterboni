@@ -76,7 +76,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
-    private int BG, INK, MUTED, GREEN, LINE, RED;
+    private int BG, INK, MUTED, GREEN, LINE, RED, GOLD;
     private boolean darkTheme;
     private String themeMode;
     private final ExecutorService network = Executors.newSingleThreadExecutor();
@@ -155,6 +155,7 @@ public class MainActivity extends Activity {
         GREEN = darkTheme ? 0xFF73C7A3 : 0xFF176449;
         LINE = darkTheme ? 0xFF2C3B49 : 0xFFE0E7ED;
         RED = darkTheme ? 0xFFF08B88 : 0xFFB04343;
+        GOLD = darkTheme ? 0xFFF2C14E : 0xFFA87300;
         super.onCreate(state);
         translationEnabled = getPreferences(MODE_PRIVATE).getBoolean("translateMenus", true);
         allowMobileModels = getPreferences(MODE_PRIVATE).getBoolean("mobileModels", false);
@@ -980,7 +981,7 @@ public class MainActivity extends Activity {
     private void bindFavorite(Button star, Restaurant restaurant) {
         boolean saved = favorites.contains(restaurant.id);
         star.setText(saved ? "★" : "☆");
-        star.setTextColor(saved ? restaurantAccent(restaurant) : MUTED);
+        star.setTextColor(saved ? GOLD : MUTED);
         star.setContentDescription(getString(saved ? R.string.favorite_item_remove : R.string.favorite_item_save, restaurant.name));
         star.setStateDescription(getString(saved ? R.string.saved : R.string.not_saved));
         star.setOnClickListener(v -> {
@@ -994,7 +995,7 @@ public class MainActivity extends Activity {
     private void bindDetailFavorite(ImageButton star, Restaurant restaurant) {
         boolean saved = favorites.contains(restaurant.id);
         star.setImageResource(saved ? R.drawable.ic_star_filled : R.drawable.ic_star);
-        star.setColorFilter(restaurantAccent(restaurant));
+        star.setColorFilter(saved ? GOLD : restaurantAccent(restaurant));
         star.setContentDescription(getString(saved ? R.string.favorite_remove : R.string.favorite_save));
         star.setOnClickListener(v -> {
             if (!favorites.remove(restaurant.id)) favorites.add(restaurant.id);
