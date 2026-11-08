@@ -52,8 +52,6 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -99,7 +97,6 @@ public class MainActivity extends Activity {
     private EditText search;
     private ImageButton searchButton, filterButton;
     private Switch menuLanguageToggle;
-    private SwipeRefreshLayout pullRefresh;
     private ProgressBar startupSpinner;
     private boolean searchOpen;
     private final Set<String> selectedServices = new HashSet<>();
@@ -300,12 +297,8 @@ public class MainActivity extends Activity {
         list.setPadding(dp(20), 0, dp(20), dp(8));
         list.setAdapter(adapter);
         list.setOnItemClickListener((parent, view, position, id) -> showDetail(visible.get(position)));
-        pullRefresh = new SwipeRefreshLayout(this);
-        pullRefresh.setColorSchemeColors(GREEN);
-        pullRefresh.setOnRefreshListener(this::loadRestaurants);
-        pullRefresh.addView(list, new ViewGroup.LayoutParams(-1, -1));
         FrameLayout content = new FrameLayout(this);
-        content.addView(pullRefresh, new FrameLayout.LayoutParams(-1, -1));
+        content.addView(list, new FrameLayout.LayoutParams(-1, -1));
         startupSpinner = new ProgressBar(this);
         startupSpinner.setIndeterminateTintList(android.content.res.ColorStateList.valueOf(GREEN));
         startupSpinner.setContentDescription(getString(R.string.loading_restaurants));
@@ -667,7 +660,6 @@ public class MainActivity extends Activity {
             } finally {
                 onUi(() -> {
                     loading = false;
-                    pullRefresh.setRefreshing(false);
                     updateStartupLoading();
                 });
             }
@@ -1053,7 +1045,6 @@ public class MainActivity extends Activity {
     private void updateStartupLoading() {
         boolean initialLoad = (loading && restaurants.isEmpty()) || (hoursLoading && visible.isEmpty());
         startupSpinner.setVisibility(initialLoad ? View.VISIBLE : View.GONE);
-        pullRefresh.setEnabled(!initialLoad);
         locationStatus.setVisibility(!initialLoad && locationStatus.length() > 0 ? View.VISIBLE : View.GONE);
     }
 
