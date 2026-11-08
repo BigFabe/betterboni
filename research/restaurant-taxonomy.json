@@ -1,0 +1,1914 @@
+{
+  "report_title": "BetterBoni restaurant taxonomy research",
+  "language": "en",
+  "research_date": "2026-11-08",
+  "sources": {
+    "index_url": "https://www.studentska-prehrana.si/sl/restaurant",
+    "detail_url_pattern": "https://www.studentska-prehrana.si/sl/restaurant/Details/{restaurant_id}",
+    "menu_endpoint": "https://www.studentska-prehrana.si/sl/restaurant/MenuForDate",
+    "access": "Public HTML index; restaurant details; POST menu fragment using a date read from that restaurant page."
+  },
+  "scope": {
+    "index_restaurants": 353,
+    "cities_in_index": 38,
+    "restaurants_sampled": 59,
+    "cities_in_sample": 38,
+    "restaurants_with_menu_items_observed": 45,
+    "restaurants_without_menu_items_observed": 14,
+    "menu_item_titles_observed": 645,
+    "coverage_statement": "Broad, city-stratified sample only; not a census of all 353 restaurants. Sample selection took up to two entries from each alphabetically ordered city group and included a few known examples. Fourteen sampled detail pages exposed no usable menu date at collection time. The other 45 yielded titles through the offered-date menu endpoint. Some chains/delivery duplicates occur, so evidence is not statistically independent."
+  },
+  "collection_method": {
+    "selection": "Read .restaurant-row data-posid, data-lokal, data-city and data-detailslink from the public index; selected up to two records per city group, then added specific known examples if absent, stopping at 59.",
+    "date_handling": "Used dates actually present in each detail page .menu-request-link onclick. Dates are recorded per restaurant; no fixed date was assumed. Retrieved one offered date per restaurant.",
+    "requests": "At most two concurrent HTTP requests; no retries. Menu fragment fetched by POST with restaurantId and the offered date.",
+    "item_extraction": "Captured h5 dish titles from .shadow-wrapper menu cards; accompaniments were considered during manual taxonomy review but titles are stored for concise reproducibility.",
+    "limitations": [
+      "Menus are time-sensitive; one day is weak evidence for a permanent restaurant identity.",
+      "No usable offered date was exposed on 14 sampled pages; absence of a visible menu is not evidence that the restaurant has no menu.",
+      "The sample includes duplicate delivery/location variants, and the public index may change.",
+      "Slovenian menu wording and abbreviations can be ambiguous; classify conservatively and allow abstention."
+    ]
+  },
+  "taxonomy": {
+    "design": "Independent of official Boni service categories. Infer from repeated dish titles across one or more observed menus, never from restaurant name. Use separate dish-format and cuisine-direction facets; labels shown on the homepage must remain sparse.",
+    "facets": [
+      {
+        "facet_id": "meal_format",
+        "description": "What kinds of dishes / meal forms recur in the menu. Multi-label allowed.",
+        "values": [
+          {
+            "id": "pizza",
+            "label_en": "Pizza",
+            "label_de": "Pizza",
+            "rule": "Pizza/pica is an explicit recurring offer."
+          },
+          {
+            "id": "pasta_noodles",
+            "label_en": "Pasta & noodles",
+            "label_de": "Pasta & Nudeln",
+            "rule": "Pasta, špageti, njoki or noodle dishes recur."
+          },
+          {
+            "id": "grill",
+            "label_en": "Grill",
+            "label_de": "Grillgerichte",
+            "rule": "Explicit grilled meat, fish or vegetables recur."
+          },
+          {
+            "id": "salads",
+            "label_en": "Salads",
+            "label_de": "Salate",
+            "rule": "Salad bowls/plates are substantial repeated options."
+          },
+          {
+            "id": "sandwich_wrap",
+            "label_en": "Sandwiches & wraps",
+            "label_de": "Sandwiches & Wraps",
+            "rule": "Sandwiches, burgers, tortillas or wraps recur."
+          },
+          {
+            "id": "rice_wok",
+            "label_en": "Rice & wok",
+            "label_de": "Reis & Wok",
+            "rule": "Rice bowls, stir-fries, wok or Asian rice/noodle plates recur."
+          },
+          {
+            "id": "soups_stews",
+            "label_en": "Soups & stews",
+            "label_de": "Suppen & Eintöpfe",
+            "rule": "Soups, obara, golaž, bograč or similar spoon dishes recur."
+          },
+          {
+            "id": "breaded_fried",
+            "label_en": "Breaded & fried",
+            "label_de": "Paniert & frittiert",
+            "rule": "Schnitzel, ocvrt dishes, fried cheese or fried seafood recur."
+          },
+          {
+            "id": "daily_plates",
+            "label_en": "Daily plates",
+            "label_de": "Tagesgerichte",
+            "rule": "Menu is a broad rotating set of composed cooked meals and no narrower format dominates."
+          },
+          {
+            "id": "vegetarian_plates",
+            "label_en": "Vegetarian dishes",
+            "label_de": "Vegetarische Gerichte",
+            "rule": "Multiple explicitly named meat-free main dishes appear. This is a menu-content signal, not a guarantee of vegetarian preparation or cross-contact."
+          }
+        ]
+      },
+      {
+        "facet_id": "cuisine_direction",
+        "description": "A broad culinary direction evidenced by dish content, not names. Multi-label allowed for genuinely mixed menus.",
+        "values": [
+          {
+            "id": "east_asian",
+            "label_en": "East Asian",
+            "label_de": "Ostasiatisch",
+            "rule": "Repeated explicitly Chinese/Sichuan/Asian dishes such as chop suey, sweet-sour, wok, rice noodles."
+          },
+          {
+            "id": "balkan_grill",
+            "label_en": "Balkan grill",
+            "label_de": "Balkan-Grill",
+            "rule": "Repeated ćevapčiči, pleskavica, lepinja, kajmak or šopska combinations."
+          },
+          {
+            "id": "italian_inspired",
+            "label_en": "Italian-inspired",
+            "label_de": "Italienisch geprägt",
+            "rule": "Repeated pizza/pasta/risotto with recognizable Italian dish forms; pizza alone may support format but not always this direction."
+          },
+          {
+            "id": "middle_eastern",
+            "label_en": "Middle Eastern",
+            "label_de": "Nahöstlich",
+            "rule": "Repeated falafel, hummus, shawarma or related dishes explicitly visible."
+          },
+          {
+            "id": "central_european_local",
+            "label_en": "Central European",
+            "label_de": "Mitteleuropäisch",
+            "rule": "Repeated schnitzel, local stews, roast/potato plates or named Slovenian regional dishes."
+          },
+          {
+            "id": "mixed_international",
+            "label_en": "Mixed menu",
+            "label_de": "Internationale Auswahl",
+            "rule": "Use only if substantial repeated menu sections span unrelated directions and none dominates; this is a fallback, not an inference from restaurant branding."
+          }
+        ]
+      }
+    ],
+    "homepage_policy": {
+      "max_labels_per_restaurant": 3,
+      "ranking": "At most two meal_format labels plus one cuisine_direction label. Rank by evidence share among distinct main-dish titles in the latest 2-4 fetched menu dates; require at least 3 supporting dishes and >=30% share for a format, >=40% for a cuisine direction. For mixed menus, show one narrow high-confidence format and optionally Mixed menu only when no direction reaches threshold. Prefer specific recurring signals over daily_plates.",
+      "display_fallback": "If only one signal passes threshold, show one label. If no label passes or evidence is thin, show none / omit chip; never force a category."
+    },
+    "observed_examples": [
+      {
+        "restaurant_id": "1478",
+        "restaurant": "ABI FALAFEL",
+        "city": "LJUBLJANA",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1478",
+        "dishes": [
+          "FALAFEL SENDVIČ",
+          "SIROVI ZAVITKI, PRILOGA",
+          "ŠPINAČNI ZAVITKI, PRILOGA"
+        ],
+        "supports": [
+          "sandwich_wrap",
+          "middle_eastern"
+        ],
+        "note": "Falafel is explicit evidence; other menu items suggest a mixed offer, so cuisine signal should require repetition across dates."
+      },
+      {
+        "restaurant_id": "3169",
+        "restaurant": "ORIENT EXPRESS, SAMOPOSTREŽNA RESTAVRACIJA",
+        "city": "LJUBLJANA",
+        "date": "9. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3169",
+        "dishes": [
+          "PIŠČANČJA MARSALA S ŠAMPINJONI, PRILOGA",
+          "OCVRT PIŠČANČJI ZREZEK S SIROM PO DUNAJSKO, PRILOGA",
+          "PAŠTA FIŽOL S KRANJSKO KLOBASO"
+        ],
+        "supports": [
+          "daily_plates",
+          "central_european_local"
+        ],
+        "note": "Wide composed daily menu; name was not used."
+      },
+      {
+        "restaurant_id": "3365",
+        "restaurant": "SHAOLIN",
+        "city": "LJUBLJANA",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3365",
+        "dishes": [
+          "SVINJINA Z MEŠANO ZELENJAVO",
+          "PIŠČANEC Z MEŠANO ZELENJAVO",
+          "GOVEDINA Z MEŠANO ZELENJAVO",
+          "RACO Z MEŠANO ZELENJAVO"
+        ],
+        "supports": [
+          "rice_wok",
+          "east_asian"
+        ],
+        "note": "Menu context also included sweet-sour soup and cabbage/sprout sides; check actual titles before assigning a format."
+      },
+      {
+        "restaurant_id": "1415",
+        "restaurant": "KITAJSKA RESTAVRACIJA NANKING",
+        "city": "NOVO MESTO",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1415",
+        "dishes": [
+          "TOFU NA SEČUANSKI NAČIN",
+          "SVINJINA NA SEČUNASKI NAČIN",
+          "SVINJSKI CHOPSUI",
+          "HRUSTLJAVI PIŠČANEC"
+        ],
+        "supports": [
+          "east_asian",
+          "rice_wok"
+        ],
+        "note": "Dish names, not the restaurant name, support this."
+      },
+      {
+        "restaurant_id": "2326",
+        "restaurant": "DAS IST VALTER",
+        "city": "KRANJ",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2326",
+        "dishes": [
+          "ČEVAPČIČI PETKA,LEPINJA, KROMPIRČEK",
+          "PLESKAVICA, LEPINJA, KROMPIRČEK",
+          "PIŠČANČJI FILE NA ŽARU, LEPINJA, KROMPIRČEK"
+        ],
+        "supports": [
+          "grill",
+          "balkan_grill"
+        ],
+        "note": "Several specific grill dish names."
+      },
+      {
+        "restaurant_id": "1176",
+        "restaurant": "PIZZERIJA VELUN",
+        "city": "VELENJE",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1176",
+        "dishes": [
+          "PIZZA MAROF",
+          "PIZZA NASEKLJANA",
+          "PIZZA ŠALEŠKA",
+          "PIZZA VRTNA"
+        ],
+        "supports": [
+          "pizza",
+          "italian_inspired"
+        ],
+        "note": "Repeated pizza titles."
+      },
+      {
+        "restaurant_id": "3294",
+        "restaurant": "GOSTILNA IN PIZZERIJA KOVAČ",
+        "city": "LITIJA",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3294",
+        "dishes": [
+          "KRALJEVA SOLATA",
+          "TUNINA SOLATA",
+          "SOLATA Z ŽAR PIŠČANCEM",
+          "SOLATA Z CRISPY PIŠČANCEM"
+        ],
+        "supports": [
+          "salads"
+        ],
+        "note": "A mixed menu can still expose a strong salad section."
+      },
+      {
+        "restaurant_id": "3332",
+        "restaurant": "ART KAVARNA ODEON",
+        "city": "IZOLA/ISOLA",
+        "date": "9. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3332",
+        "dishes": [
+          "DOMAČA POLENTA S POPEČENO HOKAIDO, FETO IN BRUSNICAMI / BREZ FETE",
+          "DOMAČA PAŠTA: POLNJENE RUTKE",
+          "FIŽOLOVA FOKAČA"
+        ],
+        "supports": [
+          "pasta_noodles",
+          "vegetarian_plates"
+        ],
+        "note": "The explicit “brez fete” variant applies only to that dish; do not infer broad diet safety."
+      },
+      {
+        "restaurant_id": "1342",
+        "restaurant": "MCDONALD'S RESTAVRACIJA - DOMŽALE",
+        "city": "DOMŽALE",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1342",
+        "dishes": [
+          "FRESH CRISPY TORTILIA IN MALI KROMPIRČEK",
+          "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+          "PEČEN FILE TRSKE IN MALI KROMPIRČEK"
+        ],
+        "supports": [
+          "sandwich_wrap",
+          "breaded_fried"
+        ],
+        "note": "Classification uses menu items; no inference from brand."
+      },
+      {
+        "restaurant_id": "3069",
+        "restaurant": "SPLOŠNA BOLNIŠNICA BREŽICE",
+        "city": "BREŽICE",
+        "date": "8. 11. 2026",
+        "url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3069",
+        "dishes": [
+          "OBARA Z ŽLIČNIKI",
+          "OCVRT PIŠČANEC, AJDOVA KAŠA Z ZELENJAVO"
+        ],
+        "supports": [
+          "soups_stews",
+          "breaded_fried",
+          "daily_plates"
+        ],
+        "note": "Only two items; one-date evidence low confidence, do not necessarily publish tags."
+      }
+    ]
+  },
+  "assignment_rules": {
+    "evidence": "Classify only from menu dish titles and explicit accompanying description. Do not use restaurant name, official Boni service tags, city, price or logo as classification evidence. Treat menu items as multiple dishes and allow multiple labels when each independently meets threshold.",
+    "confidence": "high: >=5 distinct supporting items across >=2 offered menu dates; medium: >=3 items in one date or >=3 items across menu periods; low: weaker, conflicting or title-only ambiguous. Homepage labels require medium or high; low evidence yields no label.",
+    "mixed_menus": "Score menu section share by distinct main dish titles. Mixed cuisine permits several directions if each meets its own evidence threshold; otherwise retain a format tag only or abstain. Avoid generalizing a single dish to the entire restaurant.",
+    "dietary": "No gluten-free, allergen-safe, vegan, healthy or halal guarantee from names. Dietary tags require an explicit menu assertion and remain dish-scoped; never infer allergen safety.",
+    "missing_menu": "Return status missing_menu/insufficient_evidence and empty labels; do not substitute restaurant name/category guesses. Retry only on a later scheduled refresh, not every app start."
+  },
+  "output_schema": {
+    "type": "object",
+    "required": [
+      "taxonomy_version",
+      "evidence_status",
+      "labels"
+    ],
+    "properties": {
+      "taxonomy_version": {
+        "type": "string",
+        "const": "1.0"
+      },
+      "evidence_status": {
+        "type": "string",
+        "enum": [
+          "sufficient",
+          "thin",
+          "missing_menu"
+        ]
+      },
+      "labels": {
+        "type": "array",
+        "maxItems": 3,
+        "items": {
+          "type": "object",
+          "required": [
+            "id",
+            "facet",
+            "confidence",
+            "evidence"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "facet": {
+              "type": "string",
+              "enum": [
+                "meal_format",
+                "cuisine_direction"
+              ]
+            },
+            "confidence": {
+              "type": "string",
+              "enum": [
+                "high",
+                "medium"
+              ]
+            },
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 3
+            }
+          }
+        }
+      },
+      "source_menu_hash": {
+        "type": "string"
+      }
+    }
+  },
+  "classification_prompt": "Classify a restaurant from the supplied Slovenian menu titles and their menu dates only. Ignore restaurant name, official service categories, branding, location and price. Use taxonomy version 1.0 IDs only. Count distinct main dishes by the taxonomy rules; assign at most two meal_format labels and one cuisine_direction label, only when each reaches its evidence threshold. Mixed menus may receive multiple independent labels; do not force one cuisine. If evidence is thin, inconsistent, or unavailable, return thin/missing_menu and no labels. Dietary/allergen claims are out of scope unless explicitly stated for a particular dish; never claim gluten-free or allergen safety. Return only JSON matching the schema, with up to three short dish-title evidence strings per label.",
+  "caching": {
+    "key": "Hash of normalized menu titles + relevant accompaniment text, restaurant ID, menu date window, taxonomy version and model identifier.",
+    "normalization": "Unicode normalize; lowercase; normalize whitespace/punctuation and collapse menu numbering; keep meaningful Slovenian tokens/diacritics. Sort normalized distinct items for stable hash while retaining raw text separately for evidence.",
+    "refresh": "Fetch on a bounded background refresh cadence or when menu data changes. Reuse the cached classification on app launch; call the model only on cache miss or material content/taxonomy/model version change. Cache empty/insufficient outcomes too with a shorter expiry."
+  },
+  "sampled_restaurants": [
+    {
+      "id": "3331",
+      "name": "BISTRO LUFT",
+      "city": "AJDOVŠČINA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3331",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "2308",
+      "name": "PIZZERIA BRIKSEN",
+      "city": "BLED",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2308",
+      "offered_menu_dates": [
+        "8. 11. 2026",
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026",
+        "15. 11. 2026",
+        "16. 11. 2026",
+        "17. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 21,
+      "menu_titles": [
+        "SVINJSKI VRAT, KROMPIČEK",
+        "PIŠČANČJI FILE PO DUNAJSKO, KROMPIRČEK",
+        "PLESKAVICA, KROMPIRČEK",
+        "KRANJSKA KLOBASA, KRUH IZ KRUŠNE PEČI",
+        "ŠPAGETI BOLOGNESE",
+        "ŠPAGETI CARBONARA",
+        "ŠPAGETI NAPOLITANA",
+        "BOŽANSKA SOLATA, KRUH IZ KRUŠNE PEČI",
+        "SOLATA KEBAB, KRUH IZ KRUŠNE PEČI",
+        "SOLATA TUNA, KRUH IZ KRUŠNE PEČI",
+        "OCVRTI SIR, KROMPIRČEK",
+        "VEGETARIA",
+        "PIZZA BLED",
+        "PIZZA BRIKSEN",
+        "PIZZA KRAŠKA",
+        "PIZZA HAWAI",
+        "PIZZA PIŠČANČEK",
+        "PIZZA SALAMCA",
+        "MESNA LAZANJA",
+        "OCVRTI LIGNJI",
+        "OCVRTI OSLIČ"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3352",
+      "name": "GOSTILNA GODEC",
+      "city": "BOROVNICA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3352",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "3197",
+      "name": "HUDA .",
+      "city": "BREŽICE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3197",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "PIZZA MARGHERITA",
+        "PIZZA UNO",
+        "PIZZA FIONA",
+        "PIZZA BURRATA",
+        "PIZZA ELEN",
+        "PIZZA CALABRESE",
+        "PIZZA RIVA",
+        "ZELENJAVNA MINEŠTRA",
+        "VAMPI PO TRŽAŠKO",
+        "SKUŠA Z BLITVO IN KROMPIRJEM",
+        "KRAP Z ZELENJAVO IN KROMPIRJEM",
+        "SOJNI POLPETI Z ZELENJAVO IN KROMPIRJEM",
+        "PEČEN SIR S PRILOGO",
+        "SVINJSKI ZREZEK V NARAVNI OMAKI S KROMPIRJEM",
+        "PURANJI ZREZEK V NARAVNI OMAKI S KROMPIRJEM"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3069",
+      "name": "SPLOŠNA BOLNIŠNICA BREŽICE",
+      "city": "BREŽICE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3069",
+      "offered_menu_dates": [
+        "8. 11. 2026",
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026",
+        "15. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 2,
+      "menu_titles": [
+        "OBARA Z ŽLIČNIKI",
+        "OCVRT PIŠČANEC, AJDOVA KAŠA Z ZELENJAVO"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3123",
+      "name": "GOSTILNA STARA BRAJDA",
+      "city": "CELJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3123",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "2623",
+      "name": "PE DIJAŠKI DOM CELJE",
+      "city": "CELJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2623",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 5,
+      "menu_titles": [
+        "NJOKI CARBONARA, PARMEZAN",
+        "NJOKI Z BUČNO OMAKO, PARMEZAN",
+        "PEČENICA, DUŠENO SLADKO ZELJE",
+        "SOLATNI KROŽNIK S PIŠČANCEM",
+        "SOLATNI KROŽNIK S PEČENO ZELENJAVO IN SIROM"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "1838",
+      "name": "KITAJSKO MESTO",
+      "city": "DOMŽALE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1838",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 21,
+      "menu_titles": [
+        "ŠPAGETE Z ZELENJAVO",
+        "ŠPAGETE Z MESOM ( PIŠČANEC,GOVEDINA ALI SVINJINA)",
+        "ŠPAGETE Z RAKCI",
+        "RIŽEVI REZANCI Z ZELENJAVO",
+        "RIŽEVI REZANCI Z MESOM ( PIŠČANEC,GOVEDINA ALI SVINJINA)",
+        "RIŽEVI REZANCI Z RAKCI",
+        "PRAŽENI RIŽ Z ZELENJAVO",
+        "PRAŽENI RIŽ Z MESOM ( PIŠČANEC,GOVEDINA ALI SVINJINA)",
+        "PRAŽENI RIŽ Z RAKCI",
+        "MENIHOVA POJEDINA (BREZ MESA)",
+        "PEČENI BAMBUSOM IN GOBAMI (BREZ MESA)",
+        "MESO Z ZELENJAVA ( PIŠČANEC,RACA,GOVEDINA ALI SVINJINA)",
+        "MESO Z BAMBUSOM IN GOBAMI ( PIŠČANEC,RACA,GOVEDINA ALI SVINJINA)",
+        "MESO NA SEČANSKI NAČIN ( PIŠČANEC,RACA,GOVEDINA ALI SVINJINA)",
+        "MESO S ČEBULO ( PIŠČANEC,GOVEDINA ALI SVINJINA)",
+        "OCVRT MESO V SLADKO KISLI OMAKA ( PIŠČANEC,GOVEDINA ALI SVINJINA)",
+        "PIKANTNI PIŠČANEC",
+        "HRUSTLJAVI PIŠČANEC",
+        "RIBA Z ZELENJAVA",
+        "RIBA Z BAMBNUSOM IN GOBAMI",
+        "(GLEDE STANJE GNEČA IZBIRA NEKATERI  JEDI PO DOGOVORU LAHKKO POVPRAŠAJTE)"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "1342",
+      "name": "MCDONALD'S RESTAVRACIJA - DOMŽALE",
+      "city": "DOMŽALE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1342",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "FRESH CRISPY  TORTILIA IN MALI KROMPIRČEK",
+        "MEŠANO PERUTNINSKO MESO (PERUTNIČKE) IN MALI KROMPIRČEK",
+        "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+        "PEČEN FILE TRSKE IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA S PIŠČANCEM IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA Z VEGI POLPETOM IN MALI KROMPIRČEK",
+        "TORTILJA ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "VEGI FRESH CHEESE TORTILJA IN MALI KROMPIRČEK",
+        "PLANT FRESH TORTILJA IN MALI KROMPIRČEK",
+        "BIG MAC IN MALI KROMPIRČEK",
+        "MCCHICKEN IN MALI KROMPIRČEK",
+        "FILET-O-FISH IN MALI KROMPIRČEK",
+        "MCNUGGETS PIŠČANČJI MEDALJON 6 KOSOV Z OMAKO IN MALI KROMPIRČEK",
+        "MCPLANT ALI BURGER ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "DVOJNI CHEESEBURGER IN MALI KROMPIRČEK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3332",
+      "name": "ART KAVARNA ODEON",
+      "city": "IZOLA/ISOLA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3332",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 3,
+      "menu_titles": [
+        "DOMAČA POLENTA S POPEČENO HOKAIDO, FETO IN BRUSNICAMI / BREZ FETE",
+        "DOMAČA PAŠTA: POLNJENE RUTKE",
+        "FIŽOLOVA FOKAČA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3241",
+      "name": "RESTAVRACIJA PERGOLA",
+      "city": "IZOLA/ISOLA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3241",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "TESTENINE Z ZELENJAVO",
+        "TESTENINE S TUNO",
+        "KALAMARI NA ŽARU, KROMPIR S ŠPINAČO",
+        "SARDELE NA ŽARU, KROMPIR S ŠPINAČO",
+        "PIŠČANČJI ZREZEK NA ŽARU Z ZELENJAVO",
+        "OMBOLO NA ŽARU Z ZELENJAVO",
+        "SIR NA ŽARU Z RUKOLO IN BALZAMIČNIM PRELIVOM S POMFIRJEM",
+        "ZELENJAVNI KROŽNIK",
+        "SOLATA S TUNO",
+        "CEZARJEVA SOLATA",
+        "PIZZA ŠTIRI SIRI",
+        "PIZZA TUNA",
+        "PIZZA RUKULA",
+        "PIZZA ŠUNKA",
+        "ZELENJAVNA PIZZA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3109",
+      "name": "BOLNIŠNIČNA RESTAVRACIJA SPLOŠNE BOLNIŠNICE JESENICE",
+      "city": "JESENICE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3109",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 4,
+      "menu_titles": [
+        "PURANJI ZREZEK V SMETANOVI OMAKI, ŠIROKI REZANCI",
+        "ŠIROKI REZANCI S SIROVO OMAKO",
+        "PICA BUREK",
+        "DNEVNI SOLATNI KROŽNIK Z JAJCEM"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2446",
+      "name": "KITAJSKA RESTAVRACIJA ŠANG HAI",
+      "city": "JESENICE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2446",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 20,
+      "menu_titles": [
+        "PIŠČANČJI CHOPSUI",
+        "PEČENI ŠPAGETI Z ZELENJAVO",
+        "SVINSKI CHOPSUI",
+        "MENIHOVA POJEDINA",
+        "PIŠČANEC NA SEČUANSKI NAČIN",
+        "SVINJINA NA SEČUANSKI NAČUN",
+        "PEČEI ŠPAGETI S PIŠČANCEM",
+        "SLAKO KISLA PIŠČANCEM",
+        "SOLATNI KROŽNIK Z RIBO",
+        "HRUSTLAJVI PIŠČANEC",
+        "PEČEI KITAJSKI RIŽEVI REZANCI Z ZELENJAVO",
+        "SLADKO KISLO RIBO",
+        "RIBJI CHOPSUI",
+        "PEČENI ŠPAGETI S PIŠČANCEM",
+        "PEČEN RIŽ Z ZELENJAVO",
+        "DUŠENI KALČKI",
+        "PEČEN RIŽ S PIŠČANEM",
+        "PIŠČANEC V ČESNOVI OMAKI",
+        "SOLATNI KROŽNIK S PIŠČANCEM",
+        "OCVRTE RIBO"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3275",
+      "name": "AVOKADO",
+      "city": "KOPER/CAPODISTRIA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3275",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "2265",
+      "name": "KITAJSKA RESTAVRACJA CESARSKA HIŠA-DOSTAVA",
+      "city": "KOPER/CAPODISTRIA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2265",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "PIŠČANEC CHOP SUEY",
+        "HRUSTLJAVI PIŠČANEC",
+        "PIŠČANEC V SLADKO KISLI OMAKI",
+        "SVINJINA NA SIČUANSKI NAČIN",
+        "SVINJINA Z BAMBUSOVIMI VRŠIČKI IN KITAJSKIMI GOBAMI",
+        "RAKCI Z MEŠANO ZELENJAVO",
+        "RIBA V ZELENJAVNI OMAKI",
+        "SAMOSTANSKA JED",
+        "TOUFU Z BAMBUSOM IN GOBAMI",
+        "PEČENI RIŽ S PIŠČANCEM",
+        "PEČEN RIŽ Z JAJCI IN MEŠANA ZELENJAVA",
+        "REZANCI Z RAKCI",
+        "RIŽEVI REZANCI S PIŠČANCEM",
+        "PIŠČANČJA SOLATA",
+        "SOLATA Z JAJCI"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3324",
+      "name": "RESTAVRACIJA ZADRUŽNIK KOZJE",
+      "city": "KOZJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3324",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 10,
+      "menu_titles": [
+        "PEČENE SVINJSKE REBRCE S PRILOGO",
+        "PIŠČANEC NA ŽARU S PRILOGO",
+        "SOLATA S PIŠČANČJIM MESOM",
+        "SOLATA S TUNO",
+        "OCVRT SIR S PRILOGO",
+        "SIR NA ŽARU S PRILOGO",
+        "PEČEN ZELENJAVNI POLPET S PRILOGO",
+        "PEČENICA S PRILOGO",
+        "ŠPAGETI BOLOGNESE",
+        "PIŠČANČJI ZREZEK V ŠAMPINJONOVI OMAKI, PRILOGA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2326",
+      "name": "DAS IST VALTER KRANJ",
+      "city": "KRANJ",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2326",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 13,
+      "menu_titles": [
+        "ČEVAPČIČI PETKA,LEPINJA, KROMPIRČEK",
+        "PLESKAVICA, LEPINJA, KROMPIRČEK",
+        "PIŠČANJČJE KRPICE, LEPINJA, KROMPIRČEK",
+        "PIŠČANČJI FILE NA ŽARU, LEPINJA, KROMPIRČEK",
+        "MEŠANA SOLATA Z BELIM SIROM IN KAJMAKOM",
+        "MEŠANA SOLATA Z DVEMA SIROMA",
+        "MEŠANA SOLATA S TREMI SIRI",
+        "ŠOPSKA SOLATA S PIŠČANČJIMI TRAKCI",
+        "KONDOR S PRILOGO (FIŽOLOV PIRE S KAJMAKOM, KROMPIRČEK,1/2 LEPINJE)",
+        "PREBRANAC 1/2 LEPINJE, KROMPIRČEK",
+        "SIROVA PITA, JOGURT",
+        "ŠPINAČNA PITA, JOGURT",
+        "KROMPIRJEVA PITA, JOGURT"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2866",
+      "name": "MCDONALD'S RESTAVRACIJA - KRANJ",
+      "city": "KRANJ",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2866",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "FRESH CRISPY  TORTILIA IN MALI KROMPIRČEK",
+        "MEŠANO PERUTNINSKO MESO (PERUTNIČKE) IN MALI KROMPIRČEK",
+        "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+        "PEČEN FILE TRSKE IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA S PIŠČANCEM IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA Z VEGI POLPETOM IN MALI KROMPIRČEK",
+        "TORTILJA ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "VEGI FRESH CHEESE TORTILJA IN MALI KROMPIRČEK",
+        "PLANT FRESH TORTILJA IN MALI KROMPIRČEK",
+        "BIG MAC IN MALI KROMPIRČEK",
+        "MCCHICKEN IN MALI KROMPIRČEK",
+        "FILET-O-FISH IN MALI KROMPIRČEK",
+        "MCNUGGETS PIŠČANČJI MEDALJON 6 KOSOV Z OMAKO IN MALI KROMPIRČEK",
+        "MCPLANT ALI BURGER ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "DVOJNI CHEESEBURGER IN MALI KROMPIRČEK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2284",
+      "name": "PIZZERIA FONTANA ",
+      "city": "KRŠKO",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2284",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 20,
+      "menu_titles": [
+        "PIZZA DOMAČA MALA",
+        "SOLATA S PURANOM",
+        "ZREZEK PURANJI ŽAR",
+        "ŠIROKI REZANCI MORSKI",
+        "DUNAJSKI ZREZEK",
+        "ŠPAGETI Z JURČKI",
+        "ZELENJAVNI ZREZEK",
+        "PIZZA MORSKA MALA",
+        "NJOKI BOLONEZE",
+        "WOK VEGANSKI",
+        "PIZZA ROMANA MALA",
+        "PURANJI ZREZEK OCV",
+        "PIZZA DOLENJSKA MALA",
+        "OCVRTA PANGA",
+        "ZREZEK NA ŽARU",
+        "PIZZA VEGETARIANSKA M",
+        "OCVRT SIR",
+        "PIZZA MERGERITA M",
+        "SOLATA S PIŠČANCEM",
+        "OSLIC NA ŽARU"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3279",
+      "name": "MCDONALD'S RESTAVRACIJA - LESCE",
+      "city": "LESCE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3279",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "FRESH CRISPY  TORTILIA IN MALI KROMPIRČEK",
+        "MEŠANO PERUTNINSKO MESO (PERUTNIČKE) IN MALI KROMPIRČEK",
+        "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+        "PEČEN FILE TRSKE IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA S PIŠČANCEM IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA Z VEGI POLPETOM IN MALI KROMPIRČEK",
+        "TORTILJA ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "VEGI FRESH CHEESE TORTILJA IN MALI KROMPIRČEK",
+        "PLANT FRESH TORTILJA IN MALI KROMPIRČEK",
+        "BIG MAC IN MALI KROMPIRČEK",
+        "MCCHICKEN IN MALI KROMPIRČEK",
+        "FILET-O-FISH IN MALI KROMPIRČEK",
+        "MCNUGGETS PIŠČANČJI MEDALJON 6 KOSOV Z OMAKO IN MALI KROMPIRČEK",
+        "MCPLANT ALI BURGER ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "DVOJNI CHEESEBURGER IN MALI KROMPIRČEK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3294",
+      "name": "GOSTILNA IN PIZZERIJA KOVAČ",
+      "city": "LITIJA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3294",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 13,
+      "menu_titles": [
+        "KRALJEVA SOLATA",
+        "TUNINA SOLATA",
+        "SOLATA Z ŽAR PIŠČANCEM",
+        "SOLATA Z CRISPY PIŠČANCEM",
+        "TESTENINE BOLONEZ",
+        "TESTENINE V TUNINI OMAKI",
+        "DUNAJSKI ZREZEK S POMFRIJOM",
+        "PIZZA MARGERITA",
+        "PIZZA NAPOLI",
+        "ZELENJAVNI POLPET Z DUŠENIM RIŽEM",
+        "KOVAČ BURGER",
+        "POHAN BURGER",
+        "VEGETERIJANSKI KROŽNIK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "1478",
+      "name": "ABI FALAFEL",
+      "city": "LJUBLJANA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1478",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 29,
+      "menu_titles": [
+        "FALAFEL SENDVIČ",
+        "SIROVI ZAVITKI, PRILOGA",
+        "ŠPINAČNI ZAVITKI, PRILOGA",
+        "PARIKA ZAVITKI, PRILOGA",
+        "MEŠANI ZAVITKI, PRILOGA",
+        "JAJČEVCI S SLADKIM KROMPIRJEM, PRILOGA",
+        "FATAYER Z ZELIŠČI, PRILOGA",
+        "FATAYER S ŠPINAČO, PRILOGA",
+        "FATAYER S PAPRIKO, PRILOGA",
+        "FATAYER S SIROM, PRILOGA",
+        "MEŠANI FATAYERJI, PRILOGA",
+        "FALAFEL, ARABSKI ZAVITEK, FATAYER, PRILOGA",
+        "SOLATA Z BOBOM",
+        "ČIČERIKINA ENOLONČNICA",
+        "LEČINA ENOLONČNICA",
+        "SKALOP SENDVIČ",
+        "GOVEJI IN JAGNJEČJI ŠIŠKEBAB, PRILOGA",
+        "PIŠČANČJI ŠIŠKEBAB, PRILOGA",
+        "SOLATA S PIŠČANCEM",
+        "KUBBE, PRILOGA",
+        "MESNI ZAVITKI, PRILOGA",
+        "MEŠANO MESO, PRILOGA",
+        "PIŠČANČJI TAJIN, PRILOGA",
+        "PIŠČANČJA BEDRA, PRILOGA",
+        "SKALOP PIŠČANČJI PANIRANI ZREZKI, PRILOGA",
+        "RIBA V TAHINI, PRILOGA",
+        "RIBJI TAJIN, PRILOGA",
+        "RIBJI FILE S  BABAGHANOUGHEM, PRILOGA",
+        "RIBJI FILE NA ŽARU, PRILOGA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2944",
+      "name": "OKREPČEVALNICA AJDA",
+      "city": "LJUBLJANA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2944",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "3169",
+      "name": "ORIENT EXPRESS, SAMOPOSTREŽNA RESTAVRACIJA",
+      "city": "LJUBLJANA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3169",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 5,
+      "menu_titles": [
+        "PIŠČANČJA MARSALA S ŠAMPINJONI, PRILOGA",
+        "OCVRT PIŠČANČJI ZREZEK S SIROM PO DUNAJSKO, PRILOGA",
+        "PEČENA PAPRIKA Z MLETIM MESOM IN SIROM IZ PEČICE, PARADIŽNIKOVA OMAKA, PRILOGA",
+        "PAŠTA FIŽOL S KRANJSKO KLOBASO",
+        "PERESNIKI Z OMAKO IZ PAPRIKE, BUČK IN PARADIŽNIKA S PARMEZANOM"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3365",
+      "name": "SHAOLIN",
+      "city": "LJUBLJANA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3365",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 36,
+      "menu_titles": [
+        "SVINJINA Z MEŠANO ZELENJAVO",
+        "PIŠČANEC Z MEŠANO ZELENJAVO",
+        "GOVEDINA Z MEŠANO ZELENJAVO",
+        "RACO Z MEŠANO ZELENJAVO",
+        "TOFU Z BAMBUSOM IN GOBAMI",
+        "TOFU Z MEŠANO ZELENJAVO",
+        "MEŠANO ZELENJAVO Z BAMBUSOM",
+        "BROKOLI V ČESNOVI OMAKI",
+        "SLADKO KISLA GOVEDINA",
+        "SLADKO KISLI PIŠČANEC",
+        "SLADKO KISLA RIBA",
+        "SLADKO KISLI RAKCI",
+        "SEČUANSKI PIŠČANEC - PEKOČE",
+        "SEČUANSKA GOVEDINA - PEKOČE",
+        "SEČUANSKI KALAMARI - PEKOČE",
+        "SEČUANSKI RAKCI - PEKOČE",
+        "HRUSTLJAVI PIŠČANEC",
+        "HRUTLJAVA RACA",
+        "MONGOLSKA GOVEDINA",
+        "MONGOLSKI PIŠČANEC",
+        "PIŠČANEC Z POSEBNIM OKUSOM -SLADKO PEKOČA",
+        "RIBA S POSEBNIM OKUSOM - SLADKO PEKOČA",
+        "RAKCI S POSEBNIM OKUSOM - SLADKO PEKOČA",
+        "PEKINGŠKA GOVEDINA",
+        "PEKINGŠKIU PIŠČANEC",
+        "PRAŽENI RIŽ Z ZELENJAVO",
+        "PRAŽENI RIŽ S PIŠČANCEM",
+        "PRAŽENE ŠPAGETE S PIŠČANCEM",
+        "PRAŽENE RIŽEVE ŠPAGETE Z ZELENJAVO",
+        "ŠPAGETE S PIŠČANCEM V OMAKI",
+        "ŠPAGETE Z ZELENJAVO V OMAKI",
+        "ZELEJAVNA ENA LONČNICA",
+        "MESNA ENA LONČNICA",
+        "MEŠANA SOLATA -VELIKA",
+        "ZELENA SOLATA - VELIKA",
+        "PIŠČANČJA SOLATA - VELIKA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3297",
+      "name": "LOKAL P8",
+      "city": "LJUBLJANA - ŠENTVID",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3297",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 14,
+      "menu_titles": [
+        "PIŠČANEC NA ŽARU",
+        "ZREZEK V NARAVNI OMAKI",
+        "MLADI SIR NA ŽARU",
+        "ZELENJAVNI KROŽNIK",
+        "SOLATA S TUNO",
+        "GRŠKA SOLATA",
+        "SOLATNI KROŽNIK Z PIŠČANCEM",
+        "PIZZA KLASIKA POLNOZRNATA",
+        "PIZZA MARGHERITA POLNOZRNATA",
+        "SPAGETI POLNOZRNATI S PIŠČANCEM",
+        "RIŽOTA Z PIŠČANCEM - POLNOZRNATI RIŽ",
+        "ŠPAGETI POLNOZRNATI Z MORSKIMI SADEŽI",
+        "DUNAJSKI ALI PARIŠKI ZREZEK",
+        "OSLIČ PO DUNAJSKO ALI PARIŠKO"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3298",
+      "name": "P8 - DOSTAVA",
+      "city": "LJUBLJANA - ŠENTVID",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3298",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 14,
+      "menu_titles": [
+        "PIŠČANEC NA ŽARU",
+        "ZREZEK V NARAVNI OMAKI",
+        "MLADI SIR NA ŽARU",
+        "ZELENJAVNI KROŽNIK",
+        "SOLATA S TUNO",
+        "GRŠKA SOLATA",
+        "SOLATNI KROŽNIK Z PIŠČANCEM",
+        "PIZZA KLASIKA POLNOZRNATA",
+        "PIZZA MARGHERITA POLNOZRNATA",
+        "SPAGETI POLNOZRNATI S PIŠČANCEM",
+        "RIŽOTA Z PIŠČANCEM - POLNOZRNATI RIŽ",
+        "ŠPAGETI POLNOZRNATI Z MORSKIMI SADEŽI",
+        "DUNAJSKI ALI PARIŠKI ZREZEK",
+        "OSLIČ PO DUNAJSKO ALI PARIŠKO"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3237",
+      "name": "BAŠČARŠIJA MARIBOR GOSPOSVETSKA",
+      "city": "MARIBOR",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3237",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 17,
+      "menu_titles": [
+        "10X ČEVAPI (220G), 1 LEPINJA, ČEBULA",
+        "7X ČEVAPI (150G), 1/2 LEPINJE, KAJMAK, ČEBULA",
+        "5X ČEVAPI (110G), 1/2 LEPINJE, ŠOPSKA SOLATA ČEBULA",
+        "1X PLESKAVICA (220G), 1 LEPINJA, ČEBULA",
+        "3X PREKAJENA GOVEJA KLOBASA, 1 LEPINJA, ČEBULA",
+        "220G PIŠČANČJE BEDRO BREZ KOSTI, PEČEN KROMPIR, 1/2 LEPINJE, ČEBULA",
+        "220G PURANJI ZREZEK, PEČEN KROMPIR, ČEBULA",
+        "PIŠČANČJI FILE, DŽUVEČ, 1/2 LEPINJE",
+        "220G OCVRTEGA PURANJEGA ZREZKA, OCVRT KROMPIRČEK, 1/2 LEPINJE",
+        "5X MESNIH KROGLIC, PIRE KROMPIR, PARADIŽNIKOVA OMAKA, 1/2 LEPINJE",
+        "PIŠČANČJA KREM JUHA, 1/2 LEPINJE",
+        "TELEČJA OBARA, 1/2 LEPINJE",
+        "MAKEDONSKI FIŽOL, PREKAJENA GOVEJA KLOBASA, 1/2 LEPINJE",
+        "JAJČEVEC, BUČKE, PAPRIKA, ČEBULA, PARADIŽNIK, POLENTA Z ROŽMARINOM, OLIVNO OLJE, SMETANOVA OMAKA, 1/2 LEPINJE",
+        "POLENTA, SMETANOVA OMAKA, SLANI BELI SIR",
+        "ZELENA SOLATA, PARADIŽNIK, KUMARICE, KOŠČKI TUNE, BALZAMIČNI KIS, 1/2 LEPINJA",
+        "ZELENA SOLATA, KOSI PURANJEGA ZREZKA (150G), PARADIŽNIK, KUMARE, ZELENA PAPRIKA, 1/2 LEPINJA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3397",
+      "name": "OKREPČEVALNICA \"MEDICINSKA FAKULTETA\"",
+      "city": "MARIBOR",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3397",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "3389",
+      "name": "RESTAVRACIJA IN PRENOČIŠČA ČARDA",
+      "city": "MARTJANCI",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3389",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 4,
+      "menu_titles": [
+        "GRATINIRANI PIŠČANČJI ZREZKI, PIRE KROMPIR S KORENČKOM",
+        "SEGEDIN ZELJE",
+        "VEGI KANELONI S PRILOGO",
+        "SKUTNI ŠTRUKLJI S PRILOGO"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3122",
+      "name": "MCDONALD S RESTAVRACIJA  - MURSKA SOBOTA",
+      "city": "MURSKA SOBOTA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3122",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "FRESH CRISPY  TORTILIA IN MALI KROMPIRČEK",
+        "MEŠANO PERUTNINSKO MESO (PERUTNIČKE) IN MALI KROMPIRČEK",
+        "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+        "PEČEN FILE TRSKE IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA S PIŠČANCEM IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA Z VEGI POLPETOM IN MALI KROMPIRČEK",
+        "TORTILJA ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "VEGI FRESH CHEESE TORTILJA IN MALI KROMPIRČEK",
+        "PLANT FRESH TORTILJA IN MALI KROMPIRČEK",
+        "BIG MAC IN MALI KROMPIRČEK",
+        "MCCHICKEN IN MALI KROMPIRČEK",
+        "FILET-O-FISH IN MALI KROMPIRČEK",
+        "MCNUGGETS PIŠČANČJI MEDALJON 6 KOSOV Z OMAKO IN MALI KROMPIRČEK",
+        "MCPLANT ALI BURGER ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "DVOJNI CHEESEBURGER IN MALI KROMPIRČEK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2343",
+      "name": "RESTAVRACIJA IN PIVNICA ZVEZDA",
+      "city": "MURSKA SOBOTA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2343",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 5,
+      "menu_titles": [
+        "PIŠČANČJI ORLY ZREZEK, RIZI BIZI",
+        "SEGEDIN ZELJE, PECIVO",
+        "NJOKI Z BELUŠI V SMETANI",
+        "PIZZA PO IZBIRI",
+        "KRALJEVSKA SOLATA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3243",
+      "name": "EDA RESTAVRACIJA",
+      "city": "NOVA GORICA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3243",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "2815",
+      "name": "MCDONALD'S RESTAVRACIJA NOVA GORICA",
+      "city": "NOVA GORICA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2815",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "FRESH CRISPY  TORTILIA IN MALI KROMPIRČEK",
+        "MEŠANO PERUTNINSKO MESO (PERUTNIČKE) IN MALI KROMPIRČEK",
+        "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+        "PEČEN FILE TRSKE IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA S PIŠČANCEM IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA Z VEGI POLPETOM IN MALI KROMPIRČEK",
+        "TORTILJA ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "VEGI FRESH CHEESE TORTILJA IN MALI KROMPIRČEK",
+        "PLANT FRESH TORTILJA IN MALI KROMPIRČEK",
+        "BIG MAC IN MALI KROMPIRČEK",
+        "MCCHICKEN IN MALI KROMPIRČEK",
+        "FILET-O-FISH IN MALI KROMPIRČEK",
+        "MCNUGGETS PIŠČANČJI MEDALJON 6 KOSOV Z OMAKO IN MALI KROMPIRČEK",
+        "MCPLANT ALI BURGER ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "DVOJNI CHEESEBURGER IN MALI KROMPIRČEK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3280",
+      "name": "BISTRO SITULA",
+      "city": "NOVO MESTO",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3280",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "1415",
+      "name": "KITAJSKA RESTAVRACIJA NANKING",
+      "city": "NOVO MESTO",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1415",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "TOFU NA SEČUANSKI NAČIN",
+        "SVINJINA NA SEČUNASKI NAČIN",
+        "SVINJSKI CHOPSUI",
+        "HRUSTLJAVI PIŠČANEC",
+        "RIBJI CHOPSUI",
+        "HRUSTLJAVA RACA",
+        "RIBA NA SECUANSKI NACIN",
+        "PEČEN RIŽ S PIŠČANCEM",
+        "PEČENI KITAJSKI RIŽEVI REZANCI Z ZELENJAVO",
+        "PEČENI KITAJSKI RIŽEVI REZANCI S PIŠČANCEM",
+        "PIŠČANEC NA SEČUANSKI NAČIN",
+        "GOVEJI CHOPSUI",
+        "PIŠČANČJI CHOPSUI",
+        "GOVEDINA NA SEČUANSKI NAČIN",
+        "PRAŽEN BAMBUS IN GOBAMI"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3145",
+      "name": "DIJAŠKI DOM ",
+      "city": "PORTOROŽ/PORTOROSE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3145",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "2249",
+      "name": "NEWS CAFE",
+      "city": "PORTOROŽ/PORTOROSE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2249",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 16,
+      "menu_titles": [
+        "DUNAJSKI ZREZEK IN POMFRI",
+        "HRUSTLJAVE PERUTNIČKE IN POMFRI",
+        "TESTENINE BOLONES",
+        "TESTENINE BURATA",
+        "OCVRTI SIR IN POMFRI",
+        "PIŠČANEC NA ŽARU IN PIRE",
+        "BURGER IN POMFRI",
+        "OCVRTI PIŠČANČKI BURGER IN POMFRI",
+        "PIŠČANČJI BURGER IN POMFRI",
+        "OCVRTI SIR BURGER IN POMFRI",
+        "CESAR SOLATA",
+        "TUNINA SOLATA",
+        "PIZA MAREGERITA",
+        "PIZA CAPRICOSA",
+        "PIZA SALAMI",
+        "PIZA TUNA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3343",
+      "name": "ŽITO POSTOJNA",
+      "city": "POSTOJNA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3343",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "2759",
+      "name": "RESTAVRACIJA MCDONALDS - PTUJ",
+      "city": "PTUJ",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2759",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "FRESH CRISPY  TORTILIA IN MALI KROMPIRČEK",
+        "MEŠANO PERUTNINSKO MESO (PERUTNIČKE) IN MALI KROMPIRČEK",
+        "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+        "PEČEN FILE TRSKE IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA S PIŠČANCEM IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA Z VEGI POLPETOM IN MALI KROMPIRČEK",
+        "TORTILJA ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "VEGI FRESH CHEESE TORTILJA IN MALI KROMPIRČEK",
+        "PLANT FRESH TORTILJA IN MALI KROMPIRČEK",
+        "BIG MAC IN MALI KROMPIRČEK",
+        "MCCHICKEN IN MALI KROMPIRČEK",
+        "FILET-O-FISH IN MALI KROMPIRČEK",
+        "MCNUGGETS PIŠČANČJI MEDALJON 6 KOSOV Z OMAKO IN MALI KROMPIRČEK",
+        "MCPLANT ALI BURGER ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "DVOJNI CHEESEBURGER IN MALI KROMPIRČEK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3344",
+      "name": "RESTAVRACIJA & PUB GOLD PUB",
+      "city": "RADLJE OB DRAVI",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3344",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 19,
+      "menu_titles": [
+        "STICKY FINGERSI, KROMPIR",
+        "VEGI KROŽNIK",
+        "NACHO ZREZEK, NJOKI",
+        "OCVRT SIR, RIŽ",
+        "TESTENINE CARBONNARA",
+        "ČEVAPČIČI Z OBLOGO",
+        "FIT KROŽNIK",
+        "TEDENSKA ENOLONČNICA",
+        "OCVRTA MEŠANA ZELENJAVA, RIŽ",
+        "SOLATA S TUNO",
+        "TESTENINE GENOVESE",
+        "PIZZA MARGERITA",
+        "SOLATA S PIŠČANČJIMI TRAKCI",
+        "MORSKO NABODALO",
+        "MR. CRISPY BURGER, OCVRT KROMPIRČEK",
+        "PIZZA CLASSIC",
+        "PIZZA KEBAB",
+        "MR.CLASSIC BURGER,OCVRT KROMPIRČEK",
+        "LIGNJI PO PARIŠKO, PEČENA ZELENJAVA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3036",
+      "name": "RESTAVRACIJA IN MALOPRODAJA HERMINE WECH - KOROŠKA PERUTNINA",
+      "city": "RAVNE NA KOROŠKEM",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3036",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026",
+        "16. 11. 2026",
+        "17. 11. 2026",
+        "18. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 5,
+      "menu_titles": [
+        "JUHA Z ŽLIČNIKI ALI VAMPI PO TRŽAŠKO",
+        "POLOVICA PEČENEGA PIŠČANCA, PEČEN KROMPIR",
+        "OCVRTE KRAČKE, RIŽ",
+        "OCVRT OSLIČ, VOK ZELENJAVA",
+        "OCVRT SIR, PRAŽEN KROMPIR"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3342",
+      "name": "OKREPČEVALNICA HAM-HAM",
+      "city": "ROGATEC",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3342",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 35,
+      "menu_titles": [
+        "ŠPAGETI BOLONEZ",
+        "ŠPAGETI S TUNINO OMAKO",
+        "ŠPAGETI Z GORGONZOLO",
+        "ŠPAGETI CARBONARA",
+        "ŠPAGETI S ŠAMPINJONI",
+        "PURANOV ZREZEK Z ŽARA, POMFRIT",
+        "PIŠČANČJI ZREZEK V SMETANOVI OMAKI, RIŽ",
+        "SVINSKI DUNAJSKI ZREZEK, RIŽ",
+        "FILE OSLIČA Z ŽARA, KUHAN KROMPIR",
+        "LIGNJI Z ŽARA, POMFRIT",
+        "OCVRTI LIGNJI, RIŽ",
+        "SIROVI ŠTRUKLJI",
+        "ZELENJAVNI KROŽNIK",
+        "OCVRTI ŠAMPINJONI, RIŽ",
+        "ŠAMPINJONI Z ŽARA, POMFRIT",
+        "OCVRTI SIR, RIŽ",
+        "SOLATNI KROŽNIK S PIŠČANČJIM MESOM",
+        "SOLATNI KROŽNIK Z LIGNJI",
+        "TELEČJA OBARA",
+        "GOVEJI GOLAŽ, TESTENINE",
+        "ČEVAPČIČI, POMFRIT",
+        "HAMBURGER",
+        "HAMBURGER S SIROM",
+        "HAMBURGER Z OCVRTIM SIROM",
+        "CHICKENBURGER",
+        "PIZZA MARGARITA",
+        "PIZZA S ŠUNKO",
+        "PIZZA CAPRY",
+        "PIZZA HAM",
+        "PIZZA ŠTAJERSKA",
+        "PIZZA AL TONO",
+        "PIZZA BOLOGNESE",
+        "PIZZA KEBAB",
+        "PIZZA CALZONE",
+        "PIZZA VEGETARIJANSKA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "1645",
+      "name": "BOHOR",
+      "city": "ROGAŠKA SLATINA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1645",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 39,
+      "menu_titles": [
+        "ŠPAGETI BOLONEZ",
+        "ŠPAGETI S TUNINO OMAKO",
+        "ŠPAGETI Z GORGONZOLO",
+        "ŠPAGETI CARBONARA",
+        "ŠPAGETI S ŠAMPINJONI",
+        "LAZANJA Z MLETIM MESOM",
+        "PURANOV ZREZEK Z ŽARA, POMFRIT",
+        "PIŠČANČJI ZREZEK V SMETANOVI OMAKI, RIŽ",
+        "SVINSKI DUNAJSKI ZREZEK, RIŽ",
+        "FILE OSLIČA Z ŽARA, KUHAN KROMPIR",
+        "LIGNJI Z ŽARA, POMFRIT",
+        "OCVRTI LIGNJI, RIŽ",
+        "SIROVI ŠTRUKLJI",
+        "ZELENJAVNI KROŽNIK",
+        "OCVRTI ŠAMPINJONI, RIŽ",
+        "ŠAMPINJONI Z ŽARA, POMFRIT",
+        "OCVRTI SIR, RIŽ",
+        "SOLATNI KROŽNIK S PIŠČANČJIM MESOM",
+        "SOLATNI KROŽNIK Z LIGNJI",
+        "TELEČJA OBARA",
+        "GOVEJI GOLAŽ, TESTENINE",
+        "ČEVAPČIČI, POMFRIT",
+        "HAMBURGER",
+        "HAMBURGER S SIROM",
+        "HAMBURGER Z OCVRTIM SIROM",
+        "CHICKENBURGER",
+        "PIZZA MARGARITA",
+        "PIZZA BOHOR",
+        "PIZZA ROGAŠKA",
+        "PIZZA VRAŽJA",
+        "PIZZA TIROLSKA",
+        "SIROVA PIZZA",
+        "PIZZA BOLOGNESE",
+        "PIZZA DOMAČA",
+        "PIZZA HAWAII",
+        "PIZZA CALZONE",
+        "PIZZA PIONIR",
+        "PIZZA KMEČKA",
+        "PIZZA VEGETARIJANSKA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3373",
+      "name": "HOTEL RESTAVRACIJA PRUNK",
+      "city": "SEŽANA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3373",
+      "offered_menu_dates": [
+        "8. 11. 2026",
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026",
+        "15. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 8,
+      "menu_titles": [
+        "DUNAJSKI ZREZEK, POMFRIT",
+        "PLESKAVICA, POMFRIT",
+        "VEGE KROŽNIK",
+        "POHAN SIR, POMFRIT",
+        "PIŠČANČJI ZREZEK NA ŽARU, PRILOGA",
+        "JOTA S KLOBASO (ALI BREZ)",
+        "NJOKI V OMAKI Z GORGONZOLO",
+        "PURAN PO PARIŠKO, PRILOGA"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "1213",
+      "name": "GOSTILNICA NAMANOVA",
+      "city": "SLOVENJ GRADEC",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1213",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 5,
+      "menu_titles": [
+        "SVINJSKI GYROS, DOMAČ PEČEN KROMPIR",
+        "OCVRTE PIŠČANČJE PERUTNIČKE, RIZI-BIZI",
+        "ZELENJAVNI NARASTEK",
+        "ČEBULNI OBROČKI",
+        "TEDENSKA MALICA NA ŽLICO - VAMPI"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3142",
+      "name": "PICERIJA IN PIVNICA KUFR",
+      "city": "SLOVENJ GRADEC",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3142",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "PICA MARGERITA",
+        "PICA KLASIKA",
+        "PICA KUFR",
+        "PICA SALAMI",
+        "AMERIŠKI BURGER & KROMPIRČEK",
+        "ITALIJANSKI BURGER & KROMPIRČEK",
+        "PIŠEK BURGER & KROMPIRČEK",
+        "VEGI BURGER & KROMPIRČEK",
+        "SOLATA S PEČENIM PIŠČANCEM",
+        "SOLATA Z OCVRTIM PIŠČANCEM",
+        "SOLATA S TUNO",
+        "PIŠČANČJI ZREZEK CAPRESE",
+        "PEČENE PERUTNIČKE",
+        "VEŠALICA",
+        "OCVRTE RIBJE PALČKE"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2543",
+      "name": "GOSTILNA POD ŠKALCAMI",
+      "city": "SLOVENSKE KONJICE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2543",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "2346",
+      "name": "GOSTILNA POD ŠKALCAMI - DOSTAVA",
+      "city": "SLOVENSKE KONJICE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2346",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "1716",
+      "name": "PIZZERIJA DIMNIK",
+      "city": "TRBOVLJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1716",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 13,
+      "menu_titles": [
+        "PIŠČANČJI DUNAJSKI ZREZEK, NJOKI, TATARSKA OMAKA",
+        "PIŠČANČJI FILE V NARAVNI OMAKI, POLNOZRNATE TESTENINE",
+        "PIŠČANČJI TRAKCI V GOBOVI OMAKI, KROMPIR",
+        "POLNOZRNATE TESTENINE S TUNO",
+        "KLASIKA PIZZA",
+        "MARGERITA PIZZA",
+        "OCVRT OSLIČ S KROMPIRJEVO SOLATO",
+        "PIŠČANČJA SOLATA S CIABATO IN TIROLSKO OMAKO",
+        "MEHIŠKA TORTILJA - BREZMESNA, KROMPIR",
+        "TUNA SOLATA S CIABATO IN KISLO SMETANO",
+        "SPOMLADANSKI ZAVITKI, ZELENJAVA NA ŽARU, KROMPIR",
+        "GRATINIRANE POLNOZRNATE TESTENINE S SIROM IN ZELENJAVO",
+        "SIR NA ŽARU IN KROMPIRJEM"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "1717",
+      "name": "PIZZERIJA DIMNIK - DOSTAVA",
+      "city": "TRBOVLJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1717",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 13,
+      "menu_titles": [
+        "PIŠČANČJI DUNAJSKI ZREZEK, NJOKI, TATARSKA OMAKA",
+        "PIŠČANČJI FILE V NARAVNI OMAKI, POLNOZRNATE TESTENINE",
+        "PIŠČANČJI TRAKCI V GOVOBI OMAKI, KROMPIR",
+        "POLNOZRNATE TESTENINE S TUNO",
+        "KLASIKA PIZZA",
+        "MARGERITA PIZZA",
+        "OCVRT OSLIČ S KROMPIRJEVO SOLATO",
+        "PIŠČANČJA SOLATA S CIABATO IN TIROLSKO OMAKO",
+        "MEHIŠKA TORTILJA - BREZMESNA, KROMPIR",
+        "TUNA SOLATA S CIABATO IN KISLO EMSTANO",
+        "SPOMLADANSKI ZAVITKI, ZELENJAVA NA ŽARU, KROMPIR",
+        "GRATINIRANE POLNOZRNATE TESTENINE S SIROMIN ZELENJAVO",
+        "SIR NA ŽARU Z ZELENJAVO IN KROMPIRJEM"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3291",
+      "name": "GALAKSIJA TREBNJE",
+      "city": "TREBNJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3291",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "1179",
+      "name": "MCDONALD´S RESTAVRACIJA VELENJE",
+      "city": "VELENJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1179",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "FRESH CRISPY  TORTILIA IN MALI KROMPIRČEK",
+        "MEŠANO PERUTNINSKO MESO (PERUTNIČKE) IN MALI KROMPIRČEK",
+        "FRESH FISH TORTILJA IN MALI KROMPIRČEK",
+        "PEČEN FILE TRSKE IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA S PIŠČANCEM IN MALI KROMPIRČEK",
+        "MEŠANA SOLATA Z VEGI POLPETOM IN MALI KROMPIRČEK",
+        "TORTILJA ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "VEGI FRESH CHEESE TORTILJA IN MALI KROMPIRČEK",
+        "PLANT FRESH TORTILJA IN MALI KROMPIRČEK",
+        "BIG MAC IN MALI KROMPIRČEK",
+        "MCCHICKEN IN MALI KROMPIRČEK",
+        "FILET-O-FISH IN MALI KROMPIRČEK",
+        "MCNUGGETS PIŠČANČJI MEDALJON 6 KOSOV Z OMAKO IN MALI KROMPIRČEK",
+        "MCPLANT ALI BURGER ŠPINAČA SIR IN MALI KROMPIRČEK",
+        "DVOJNI CHEESEBURGER IN MALI KROMPIRČEK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "1176",
+      "name": "PIZZERIJA VELUN",
+      "city": "VELENJE",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/1176",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "PIZZA MAROF",
+        "PIZZA NASEKLJANA",
+        "PIZZA ŠALEŠKA",
+        "PIZZA VRTNA",
+        "PIZZA KONJSKA",
+        "MEŠANA SOLATA Z JAJCI",
+        "SOLATA S PIŠČANCEM",
+        "ZELENJAVNI KROŽNIK VELUN",
+        "OLIMSKI SIR NA ŽARU S PRILOGO",
+        "NJOKI VELUN",
+        "VRAŽJI REZANCI",
+        "JESENSKI NJOKI",
+        "ŠPAGETI BOLONEZE",
+        "TUNINE TESTENINE",
+        "ŠPAGETI Z GOBICAMI"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3253",
+      "name": "TVOJ CHEF RESTAVRACIJA",
+      "city": "ZAGORJE OB SAVI",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3253",
+      "offered_menu_dates": [],
+      "menu_date_fetched": null,
+      "menu_item_count": 0,
+      "menu_titles": null,
+      "status": "no_menu_observed"
+    },
+    {
+      "id": "3340",
+      "name": "SB NOVA GORICA",
+      "city": "ŠEMPETER PRI GORICI",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3340",
+      "offered_menu_dates": [
+        "8. 11. 2026",
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026",
+        "15. 11. 2026",
+        "16. 11. 2026",
+        "17. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 3,
+      "menu_titles": [
+        "PURANJA PEČENKA V OMAKI, SKUTNI ŠTRUKLJI",
+        "PURANJA PEČENKA V OMAKI, BELA POLENTA",
+        "ZELENJAVNA OMAKA, SKUTNI ŠTRUKLJI"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2252",
+      "name": "DAS IST VALTER ŠKOFJA LOKA",
+      "city": "ŠKOFJA LOKA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2252",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 13,
+      "menu_titles": [
+        "ČEVAPČIČI PETKA,LEPINJA, KROMPIRČEK",
+        "PLESKAVICA, LEPINJA, KROMPIRČEK",
+        "PIŠČANJČJE KRPICE, LEPINJA, KROMPIRČEK",
+        "PIŠČANČJI FILE NA ŽARU, LEPINJA, KROMPIRČEK",
+        "MEŠANA SOLATA Z BELIM SIROM IN KAJMAKOM",
+        "MEŠANA SOLATA Z DVEMA SIROMA",
+        "MEŠANA SOLATA S TREMI SIRI",
+        "ŠOPSKA SOLATA S PIŠČANČJIMI TRAKCI",
+        "KONDOR S PRILOGO (FIŽOLOV PIRE S KAJMAKOM, KROMPIRČEK,1/2 LEPINJE)",
+        "PREBRANAC 1/2 LEPINJE, KROMPIRČEK",
+        "SIROVA PITA, JOGURT",
+        "ŠPINAČNA PITA, JOGURT",
+        "KROMPIRJEVA PITA, JOGURT"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "2591",
+      "name": "GARAČ - RESTAVRACIJA \"M\"",
+      "city": "ŠKOFJA LOKA",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/2591",
+      "offered_menu_dates": [
+        "8. 11. 2026"
+      ],
+      "menu_date_fetched": "8. 11. 2026",
+      "menu_item_count": 15,
+      "menu_titles": [
+        "GOVEJ ZREZEK NA ŽARU S POMFRIJEM",
+        "PIŠČANČJI FILE NA ŽARU S KUHANO ZELENJAVO",
+        "ČEVAPČIČI S PEČENIM KROMPIRJEM",
+        "POLPET S KAJMAKOM IN RIŽEM",
+        "TUNINA SOLATA",
+        "SOLATA S PEČENIM PIŠČANCEM",
+        "VEGE KROŽNIK S PEČENO ZELENJAVO",
+        "SIR Z ŽARA S KUHANO ZELENJAVO",
+        "FILE OSLIČA NA ŽARU S KROMPIRJEM IN BLITVO",
+        "RIBJI POLPET Z ZELENJAVO",
+        "TUNINA PICA",
+        "VEGI PICA",
+        "GOVEJI KEBAB",
+        "PIŠČANČJI CHEESEBURGER – HAMBURGER S SIROM",
+        "SIROV BUREK"
+      ],
+      "status": "menu_observed"
+    },
+    {
+      "id": "3323",
+      "name": "RESTAVRACIJA ZADRUŽNIK ŠMARJE",
+      "city": "ŠMARJE PRI JELŠAH",
+      "detail_url": "https://www.studentska-prehrana.si/sl/restaurant/Details/3323",
+      "offered_menu_dates": [
+        "9. 11. 2026",
+        "10. 11. 2026",
+        "11. 11. 2026",
+        "12. 11. 2026",
+        "13. 11. 2026",
+        "14. 11. 2026"
+      ],
+      "menu_date_fetched": "9. 11. 2026",
+      "menu_item_count": 10,
+      "menu_titles": [
+        "PEČENE SVINJSKE REBRCE S PRILOGO",
+        "SOLATA S PIŠČANČJIM MESOM",
+        "SOLATA S TUNO",
+        "OCVRT SIR S PRILOGO",
+        "SIR NA ŽARU S PRILOGO",
+        "PEČEN ZELENJAVNI POLPET S PRILOGO",
+        "PEČENICA, ZABELJEN FIŽOL, KISLO ZELJE",
+        "ŠPAGETI BOLOGNESE",
+        "PIŠČANČJI ZREZEK V ŠAMPINJONOVI OMAKI, PRILOGA",
+        "ZDROBOV NARASTEK"
+      ],
+      "status": "menu_observed"
+    }
+  ]
+}
