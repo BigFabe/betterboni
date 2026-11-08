@@ -1550,7 +1550,7 @@ public class MainActivity extends Activity {
         public View getView(int position, View recycled, ViewGroup parent) {
             Restaurant item = visible.get(position);
             LinearLayout outer;
-            TextView name, categories, distance, price, hours;
+            TextView name, categories, distance, price, hours, address;
             if (recycled == null) {
                 outer = column();
                 LinearLayout line = row();
@@ -1561,6 +1561,10 @@ public class MainActivity extends Activity {
                 categories.setSingleLine(true);
                 categories.setEllipsize(android.text.TextUtils.TruncateAt.END);
                 copy.addView(name);
+                address = text("", 12, MUTED, false);
+                address.setMaxLines(2);
+                address.setEllipsize(android.text.TextUtils.TruncateAt.END);
+                margin(copy, address, 3, 0);
                 margin(copy, categories, 4, 0);
                 line.addView(copy, new LinearLayout.LayoutParams(0, -2, 1));
                 LinearLayout numbers = column();
@@ -1581,12 +1585,17 @@ public class MainActivity extends Activity {
                 Button favorite = favoriteButton();
                 line.addView(favorite, new LinearLayout.LayoutParams(dp(48), dp(48)));
                 outer.addView(line, new LinearLayout.LayoutParams(-1, -2));
-                outer.setTag(new TextView[]{name, categories, distance, price, favorite, hours});
+                outer.setTag(new TextView[]{name, categories, distance, price, favorite, hours, address});
             } else {
                 outer = (LinearLayout) recycled;
             }
             TextView[] views = (TextView[]) outer.getTag();
             bindRestaurantName(views[0], item, 14);
+            String addressText = item.address.isEmpty() ? item.city
+                    : item.address + (item.city.isEmpty() ? "" : ", " + item.city);
+            views[6].setText(addressText);
+            boolean searching = !Restaurant.searchable(search.getText().toString()).isEmpty();
+            views[6].setVisibility(searching && !addressText.trim().isEmpty() ? View.VISIBLE : View.GONE);
             if (classificationEnabled && settingsPage == null && Boolean.TRUE.equals(menuAvailability.get(item.id))) restaurantClassifier.request(item);
             String categoriesText = classificationEnabled
                     ? RestaurantTaxonomy.labels(classifications.getOrDefault(item.id, java.util.Collections.emptyList()), getResources())
