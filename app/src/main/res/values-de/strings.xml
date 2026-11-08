@@ -134,4 +134,8 @@
     <string name="class_middle_east">Nahöstlich</string>
     <string name="class_local">Mitteleuropäisch</string>
     <string name="class_mixed">Internationale Auswahl</string>
+    <string name="speech_missing_voice">Slowenische Stimme fehlt</string>
+    <string name="speech_install_slovenian">Installiere oder aktiviere eine slowenische Stimme in der Android-Sprachausgabe, um die Originalaussprache zu hören.</string>
+    <string name="speech_settings">Spracheinstellungen</string>
+    <string name="speech_failed">Vorlesen fehlgeschlagen. Prüfe die Android-Einstellungen zur Sprachausgabe.</string>
 </resources>

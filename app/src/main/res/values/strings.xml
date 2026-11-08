@@ -134,4 +134,8 @@
     <string name="class_middle_east">Middle Eastern</string>
     <string name="class_local">Central European</string>
     <string name="class_mixed">Mixed menu</string>
+    <string name="speech_missing_voice">Slovenian voice unavailable</string>
+    <string name="speech_install_slovenian">Install or enable a Slovenian voice in Android text-to-speech settings to hear the original pronunciation.</string>
+    <string name="speech_settings">Voice settings</string>
+    <string name="speech_failed">Speech could not be played. Check Android text-to-speech settings.</string>
 </resources>

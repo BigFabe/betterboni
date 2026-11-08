@@ -122,6 +122,7 @@ public class MainActivity extends Activity {
     private int detailGeneration;
     private String openRestaurantId;
     private MenuTranslator menuTranslator;
+    private MenuSpeaker menuSpeaker;
     private RestaurantClassifier restaurantClassifier;
     private boolean classificationEnabled;
     private final Map<String, List<RestaurantTaxonomy.Tag>> classifications = new LinkedHashMap<>();
@@ -157,6 +158,7 @@ public class MainActivity extends Activity {
         super.onCreate(state);
         translationEnabled = getPreferences(MODE_PRIVATE).getBoolean("translateMenus", true);
         allowMobileModels = getPreferences(MODE_PRIVATE).getBoolean("mobileModels", false);
+        menuSpeaker = new MenuSpeaker(this);
         menuTranslator = new MenuTranslator(this, getPreferences(MODE_PRIVATE).getString("appLanguage", "en"));
         translationEngine = getPreferences(MODE_PRIVATE).getString("translationEngine", "llm");
         configureTranslator();
@@ -1051,6 +1053,7 @@ public class MainActivity extends Activity {
     }
 
     @Override protected void onStop() {
+        menuSpeaker.stop();
         hoursClock.removeCallbacks(hoursTick);
         locationManager.removeUpdates(locationListener);
         super.onStop();
@@ -1347,6 +1350,10 @@ public class MainActivity extends Activity {
             meal.setPadding(0, dp(12), 0, dp(12));
             TextView title = text(menu[0], 16, INK, true);
             meal.addView(title);
+            meal.setOnLongClickListener(v -> {
+                menuSpeaker.speak(menu[0]);
+                return true;
+            });
             TextView sides = text(menu[1], 13, MUTED, false);
             if (!menu[1].isEmpty()) margin(meal, sides, 3, 0);
             if (translate) {
@@ -1421,6 +1428,7 @@ public class MainActivity extends Activity {
     }
 
     private void closeDetail() {
+        menuSpeaker.stop();
         ++detailGeneration;
         ++menuRenderVersion;
         currentMenuBody = null;
@@ -1470,6 +1478,7 @@ public class MainActivity extends Activity {
     @Override protected void onDestroy() {
         ++menuRenderVersion;
         menuTranslator.close();
+        menuSpeaker.close();
         restaurantClassifier.close();
         hoursClock.removeCallbacks(hoursTick);
         hoursRepository.close();
