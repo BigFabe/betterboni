@@ -64,6 +64,7 @@
     <string name="radius_error">Enter a radius greater than 0 km.</string>
     <string name="field_unit">%1$s in %2$s</string>
     <string name="vegetarian">Vegetarian options</string>
+    <string name="restaurant_without_vegetarian_label">%1$s. No vegetarian designation from Boni.</string>
     <string name="delivery">Delivery</string>
     <string name="salad_bar">Salad bar</string>
     <string name="accessible">Accessible</string>

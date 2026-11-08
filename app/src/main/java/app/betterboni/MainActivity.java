@@ -16,6 +16,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.Uri;
@@ -23,7 +24,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -987,6 +991,21 @@ public class MainActivity extends Activity {
         return star;
     }
 
+    private void bindRestaurantName(TextView title, Restaurant restaurant, int iconSize) {
+        if (restaurant.vegetarian) {
+            title.setText(restaurant.name);
+            title.setContentDescription(restaurant.name);
+            return;
+        }
+        SpannableString name = new SpannableString(restaurant.name + "\u00A0\uFFFC");
+        Drawable marker = getDrawable(R.drawable.ic_vegetarian_unmarked).mutate();
+        marker.setTint(MUTED);
+        marker.setBounds(0, 0, dp(iconSize), dp(iconSize));
+        name.setSpan(new ImageSpan(marker, ImageSpan.ALIGN_BASELINE), name.length() - 1, name.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        title.setText(name);
+        title.setContentDescription(getString(R.string.restaurant_without_vegetarian_label, restaurant.name));
+    }
+
     private int restaurantAccent(Restaurant restaurant) {
         return switch (availability.getOrDefault(restaurant.id, OpeningHours.Status.UNKNOWN)) {
             case OPEN -> GREEN;
@@ -1160,6 +1179,7 @@ public class MainActivity extends Activity {
         heading.addView(back, new LinearLayout.LayoutParams(dp(48), dp(48)));
         TextView restaurantName = text(restaurant.name, 24, INK, true);
         restaurantName.setPadding(0, dp(6), 0, 0);
+        bindRestaurantName(restaurantName, restaurant, 16);
         heading.addView(restaurantName, new LinearLayout.LayoutParams(0, -2, 1));
         margin(detail, heading, 0, 8);
         TextView contribution = text(Restaurant.euros(restaurant.contribution), 24, restaurantAccent(restaurant), true);
@@ -1562,7 +1582,7 @@ public class MainActivity extends Activity {
                 outer = (LinearLayout) recycled;
             }
             TextView[] views = (TextView[]) outer.getTag();
-            views[0].setText(item.name);
+            bindRestaurantName(views[0], item, 14);
             if (classificationEnabled && settingsPage == null && Boolean.TRUE.equals(menuAvailability.get(item.id))) restaurantClassifier.request(item);
             String categoriesText = classificationEnabled
                     ? RestaurantTaxonomy.labels(classifications.getOrDefault(item.id, java.util.Collections.emptyList()), getResources())
