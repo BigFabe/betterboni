@@ -46,6 +46,8 @@
     <string name="other">Sonstiges</string>
     <string name="favorites_only">Nur Favoriten</string>
     <string name="show_closed">Geschlossene anzeigen</string>
+    <string name="show_without_menu">Ohne Menü anzeigen</string>
+    <string name="no_open_restaurants_with_menu">Keine offenen Restaurants mit Menü gefunden.</string>
     <string name="sort_by">Sortierung</string>
     <string name="sort_order">Sortierreihenfolge</string>
     <string-array name="sort_options"><item>Nähe</item><item>Eigenanteil ↑</item><item>Name A–Z</item><item>Bewertung ↓</item></string-array>

@@ -80,6 +80,14 @@ final class RestaurantClassifier implements AutoCloseable {
         });
     }
 
+    void rememberMenu(String id, MenuEvidence evidence) {
+        if (closed) return;
+        disk.execute(() -> {
+            try { cache.saveMenu(id, evidence); }
+            catch (Exception error) { android.util.Log.w("BetterBoni", "Menu evidence could not be cached", error); }
+        });
+    }
+
     void observe(Restaurant restaurant, List<String[]> menus) {
         if (closed) return;
         int version = generation;

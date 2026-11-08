@@ -103,7 +103,8 @@ public class MainActivity extends Activity {
     private int minPrice = 0, maxPrice = Integer.MAX_VALUE, minRating = 0;
     private double radiusMeters = Double.POSITIVE_INFINITY;
     private Set<String> favorites;
-    private boolean onlyFavorites, showClosed, hoursLoading;
+    private boolean onlyFavorites, showClosed, showWithoutMenu, hoursLoading;
+    private final Map<String, Boolean> menuAvailability = new LinkedHashMap<>();
     private HoursRepository hoursRepository;
     private final Map<String, String> hoursSchedules = new LinkedHashMap<>();
     private final Map<String, OpeningHours.Status> availability = new LinkedHashMap<>();
@@ -190,6 +191,12 @@ public class MainActivity extends Activity {
                 availability.put(id, OpeningHours.status(schedule));
                 filter();
             }
+            @Override public void onMenu(String id, Boolean hasMenu, MenuEvidence evidence) {
+                if (hasMenu == null) menuAvailability.remove(id);
+                else menuAvailability.put(id, hasMenu);
+                if (evidence != null) restaurantClassifier.rememberMenu(id, evidence);
+                filter();
+            }
             @Override public void onLoading(boolean active) {
                 hoursLoading = active;
                 filter();
@@ -199,6 +206,7 @@ public class MainActivity extends Activity {
         if (state != null) {
             onlyFavorites = state.getBoolean("onlyFavorites");
             showClosed = state.getBoolean("showClosed");
+            showWithoutMenu = state.getBoolean("showWithoutMenu");
             sortMode = state.getInt("sortMode", 0);
             restoredQuery = state.getString("query", "");
             searchOpen = state.getBoolean("searchOpen");
@@ -537,7 +545,10 @@ public class MainActivity extends Activity {
 
     private void warmClassifications() {
         if (!classificationEnabled || settingsPage != null) return;
-        for (int i = 0; i < Math.min(12, visible.size()); i++) restaurantClassifier.request(visible.get(i));
+        for (int i = 0; i < Math.min(12, visible.size()); i++) {
+            Restaurant restaurant = visible.get(i);
+            if (Boolean.TRUE.equals(menuAvailability.get(restaurant.id))) restaurantClassifier.request(restaurant);
+        }
     }
 
     private void llmField(LinearLayout form, String label, String hint, String preference, boolean secret) {
@@ -676,6 +687,7 @@ public class MainActivity extends Activity {
         for (Restaurant item : restaurants) {
             OpeningHours.Status open = availability.getOrDefault(item.id, OpeningHours.Status.UNKNOWN);
             if (open == OpeningHours.Status.UNKNOWN || (!showClosed && query.isEmpty() && open == OpeningHours.Status.CLOSED)) continue;
+            if (!showWithoutMenu && !Boolean.TRUE.equals(menuAvailability.get(item.id))) continue;
             if (onlyFavorites && !favorites.contains(item.id)) continue;
             if (!item.services.containsAll(selectedServices)) continue;
             if (item.contribution < minPrice || item.contribution > maxPrice) continue;
@@ -701,7 +713,7 @@ public class MainActivity extends Activity {
                     : onlyFavorites && favorites.isEmpty()
                         ? getString(R.string.no_favorites)
                         : !showClosed && query.isEmpty() && selectedServices.isEmpty()
-                            ? getString(R.string.no_open_restaurants)
+                            ? getString(showWithoutMenu ? R.string.no_open_restaurants : R.string.no_open_restaurants_with_menu)
                             : getString(R.string.no_results));
         empty.setVisibility(visible.isEmpty() && !restaurants.isEmpty() && !hoursLoading ? View.VISIBLE : View.GONE);
         updateStartupLoading();
@@ -712,7 +724,7 @@ public class MainActivity extends Activity {
     private void updateFilterButton() {
         int active = selectedServices.size() + (minPrice > 0 ? 1 : 0)
                 + (maxPrice < Integer.MAX_VALUE ? 1 : 0) + (minRating > 0 ? 1 : 0)
-                + (Double.isFinite(radiusMeters) ? 1 : 0) + (onlyFavorites ? 1 : 0) + (showClosed ? 1 : 0);
+                + (Double.isFinite(radiusMeters) ? 1 : 0) + (onlyFavorites ? 1 : 0) + (showClosed ? 1 : 0) + (showWithoutMenu ? 1 : 0);
         filterButton.setImageResource(active == 0 ? R.drawable.ic_filter : R.drawable.ic_filter_active);
         filterButton.setStateDescription(active == 0 ? getString(R.string.no_active_filters) : getString(R.string.active_filters, active));
         filterButton.setContentDescription(getString(R.string.filter_accessibility, active, sortLabel()));
@@ -749,6 +761,8 @@ public class MainActivity extends Activity {
         metaTiles.addView(favoritesOnly);
         ToggleButton closed = filterTile(getString(R.string.show_closed), showClosed);
         metaTiles.addView(closed);
+        ToggleButton withoutMenu = filterTile(getString(R.string.show_without_menu), showWithoutMenu);
+        metaTiles.addView(withoutMenu);
         form.addView(metaTiles, new LinearLayout.LayoutParams(-1, -2));
         LinearLayout sortRow = row();
         sortRow.addView(text(getString(R.string.sort_by), 14, INK, false), new LinearLayout.LayoutParams(0, -2, 1));
@@ -793,6 +807,7 @@ public class MainActivity extends Activity {
             sortMode = sorting.getSelectedItemPosition();
             onlyFavorites = favoritesOnly.isChecked();
             showClosed = closed.isChecked();
+            showWithoutMenu = withoutMenu.isChecked();
             minRating = rating.getSelectedItemPosition();
             from.setError(null);
             to.setError(null);
@@ -816,6 +831,7 @@ public class MainActivity extends Activity {
         checks.values().forEach(tile -> tile.setOnCheckedChangeListener((button, checked) -> applyFilters.run()));
         favoritesOnly.setOnCheckedChangeListener((button, checked) -> applyFilters.run());
         closed.setOnCheckedChangeListener((button, checked) -> applyFilters.run());
+        withoutMenu.setOnCheckedChangeListener((button, checked) -> applyFilters.run());
         AdapterView.OnItemSelectedListener selectionChanged = new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) { applyFilters.run(); }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
@@ -835,6 +851,7 @@ public class MainActivity extends Activity {
             sorting.setSelection(0);
             favoritesOnly.setChecked(false);
             closed.setChecked(false);
+            withoutMenu.setChecked(false);
             from.setText("");
             to.setText("");
             radius.setText("");
@@ -1253,13 +1270,21 @@ public class MainActivity extends Activity {
         return MenuEvidence.parse(document);
     }
 
+    private void rememberMenus(Restaurant restaurant, List<String[]> menus) {
+        boolean hasMenu = menus.stream().anyMatch(menu -> !menu[0].trim().isEmpty());
+        menuAvailability.put(restaurant.id, hasMenu);
+        hoursRepository.rememberMenu(restaurant.id, hasMenu);
+        restaurantClassifier.observe(restaurant, menus);
+        filter();
+    }
+
     private void showMenu(LinearLayout detail, Restaurant restaurant, List<MenuDay> days,
                           List<String[]> embeddedMenus, int generation) {
         LinearLayout menuBody = column();
         if (days.isEmpty()) {
             detail.addView(menuBody);
             renderMenus(menuBody, embeddedMenus);
-            restaurantClassifier.observe(restaurant, embeddedMenus);
+            rememberMenus(restaurant, embeddedMenus);
             return;
         }
         LocalDate today = LocalDate.now(ZoneId.of("Europe/Ljubljana"));
@@ -1271,7 +1296,7 @@ public class MainActivity extends Activity {
         detail.addView(menuBody);
         if (day.embedded && !embeddedMenus.isEmpty()) {
             renderMenus(menuBody, embeddedMenus);
-            restaurantClassifier.observe(restaurant, embeddedMenus);
+            rememberMenus(restaurant, embeddedMenus);
         } else loadMenuDay(restaurant, day, menuBody, generation);
     }
 
@@ -1288,7 +1313,7 @@ public class MainActivity extends Activity {
                 onUi(() -> {
                     if (generation == detailGeneration) {
                         renderMenus(body, menus);
-                        restaurantClassifier.observe(restaurant, menus);
+                        rememberMenus(restaurant, menus);
                     }
                 });
             } catch (Exception error) {
@@ -1478,6 +1503,7 @@ public class MainActivity extends Activity {
         out.putDouble("radiusMeters", radiusMeters);
         out.putBoolean("onlyFavorites", onlyFavorites);
         out.putBoolean("showClosed", showClosed);
+        out.putBoolean("showWithoutMenu", showWithoutMenu);
         out.putInt("sortMode", sortMode);
         super.onSaveInstanceState(out);
     }
@@ -1537,7 +1563,7 @@ public class MainActivity extends Activity {
             }
             TextView[] views = (TextView[]) outer.getTag();
             views[0].setText(item.name);
-            if (classificationEnabled && settingsPage == null) restaurantClassifier.request(item);
+            if (classificationEnabled && settingsPage == null && Boolean.TRUE.equals(menuAvailability.get(item.id))) restaurantClassifier.request(item);
             String categoriesText = classificationEnabled
                     ? RestaurantTaxonomy.labels(classifications.getOrDefault(item.id, java.util.Collections.emptyList()), getResources())
                     : item.categorySummary(getResources());

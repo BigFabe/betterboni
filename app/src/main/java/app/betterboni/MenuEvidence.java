@@ -71,6 +71,10 @@ final class MenuEvidence {
     static MenuEvidence fetch(Restaurant restaurant) throws Exception {
         Document document = Jsoup.connect(restaurant.url).userAgent("BetterBoni/0.1 (menu classification)")
                 .timeout(20000).maxBodySize(8 * 1024 * 1024).get();
+        return fetch(restaurant, document);
+    }
+
+    static MenuEvidence fetch(Restaurant restaurant, Document document) throws Exception {
         List<String[]> menus = parse(document);
         if (!menus.isEmpty()) return new MenuEvidence(menus);
         Pattern argument = Pattern.compile("GetMenuForDate\\(\\s*\\d+\\s*,\\s*'([^']+)'");

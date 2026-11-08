@@ -10,7 +10,10 @@ import android.os.Handler;
 import android.os.Looper;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -22,6 +25,7 @@ import java.util.concurrent.Executors;
 final class HoursRepository implements AutoCloseable {
     interface Listener {
         void onHours(String id, String schedule);
+        void onMenu(String id, Boolean hasMenu, MenuEvidence evidence);
         void onLoading(boolean loading);
     }
 
@@ -59,8 +63,13 @@ final class HoursRepository implements AutoCloseable {
                     if (row.moveToFirst()) {
                         long age = System.currentTimeMillis() - row.getLong(1);
                         if (age >= 0 && age < MAX_AGE_MS) {
-                            finish(restaurant.id, row.getString(0));
-                            return;
+                            String schedule = row.getString(0);
+                            Boolean hasMenu = cachedMenu(restaurant.id);
+                            if (hasMenu != null) {
+                                finish(restaurant.id, schedule, hasMenu, null);
+                                return;
+                            }
+                            main.post(() -> { if (!closed) listener.onHours(restaurant.id, schedule); });
                         }
                     }
                 } catch (Exception error) {
@@ -78,17 +87,25 @@ final class HoursRepository implements AutoCloseable {
     private void download(Restaurant restaurant) {
         try {
             if (closed) return;
-            String schedule = OpeningHours.extract(Jsoup.connect(restaurant.url)
+            Document document = Jsoup.connect(restaurant.url)
                     .userAgent("BetterBoni/0.1 (Android; unofficial student meal directory)")
-                    .timeout(20000).maxBodySize(8 * 1024 * 1024).get());
+                    .timeout(20000).maxBodySize(8 * 1024 * 1024).get();
+            String schedule = OpeningHours.extract(document);
+            MenuEvidence fetched = null;
+            try { fetched = MenuEvidence.fetch(restaurant, document); }
+            catch (Exception error) { android.util.Log.w("BetterBoni", "Menu availability could not be checked", error); }
+            MenuEvidence evidence = fetched;
+            Boolean hasMenu = evidence == null ? null : evidence.dishes.length() > 0;
             if (closed) return;
             disk.execute(() -> {
-                try { save(restaurant.id, schedule); }
-                catch (Exception error) { android.util.Log.w("BetterBoni", "Opening hours could not be cached", error); }
-                finish(restaurant.id, schedule);
+                try {
+                    save(restaurant.id, schedule);
+                    if (hasMenu != null) saveMenu(restaurant.id, hasMenu);
+                } catch (Exception error) { android.util.Log.w("BetterBoni", "Restaurant details could not be cached", error); }
+                finish(restaurant.id, schedule, hasMenu, evidence);
             });
         } catch (Exception error) {
-            if (!closed) finish(restaurant.id, null);
+            if (!closed) finish(restaurant.id, null, null, null);
         }
     }
 
@@ -102,6 +119,34 @@ final class HoursRepository implements AutoCloseable {
         });
     }
 
+    void rememberMenu(String id, boolean hasMenu) {
+        if (closed) return;
+        disk.execute(() -> {
+            try { saveMenu(id, hasMenu); }
+            catch (Exception error) { android.util.Log.w("BetterBoni", "Menu availability could not be cached", error); }
+            main.post(() -> { if (!closed) listener.onMenu(id, hasMenu, null); });
+        });
+    }
+
+    private String today() { return LocalDate.now(ZoneId.of("Europe/Ljubljana")).toString(); }
+
+    private Boolean cachedMenu(String id) {
+        try (Cursor row = cache.getReadableDatabase().query("menu_availability", new String[]{"has_menu"},
+                "restaurant_id=? AND fetched_day=?", new String[]{id, today()}, null, null, null)) {
+            return row.moveToFirst() ? row.getInt(0) != 0 : null;
+        }
+    }
+
+    private void saveMenu(String id, boolean hasMenu) {
+        ContentValues values = new ContentValues();
+        values.put("restaurant_id", id);
+        values.put("has_menu", hasMenu ? 1 : 0);
+        values.put("fetched_day", today());
+        if (cache.getWritableDatabase().insertWithOnConflict("menu_availability", null, values, SQLiteDatabase.CONFLICT_REPLACE) == -1) {
+            throw new IllegalStateException("Menu availability could not be cached.");
+        }
+    }
+
     private void save(String id, String schedule) {
         ContentValues values = new ContentValues();
         values.put("restaurant_id", id);
@@ -112,11 +157,12 @@ final class HoursRepository implements AutoCloseable {
         }
     }
 
-    private void finish(String id, String schedule) {
+    private void finish(String id, String schedule, Boolean hasMenu, MenuEvidence evidence) {
         main.post(() -> {
             if (closed) return;
-            if (schedule == null) failed.add(id);
+            if (schedule == null || hasMenu == null) failed.add(id);
             listener.onHours(id, schedule);
+            listener.onMenu(id, hasMenu, evidence);
             remaining--;
             listener.onLoading(remaining > 0);
         });
@@ -130,12 +176,16 @@ final class HoursRepository implements AutoCloseable {
     }
 
     private static final class Cache extends SQLiteOpenHelper {
-        Cache(Context context) { super(context, "opening_hours.db", null, 1); }
+        Cache(Context context) { super(context, "opening_hours.db", null, 2); }
+        private void createMenuTable(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE menu_availability (restaurant_id TEXT PRIMARY KEY, has_menu INTEGER NOT NULL, fetched_day TEXT NOT NULL)");
+        }
         @Override public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE hours (restaurant_id TEXT PRIMARY KEY, schedule TEXT NOT NULL, fetched_at INTEGER NOT NULL)");
+            createMenuTable(db);
         }
         @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            throw new IllegalStateException("No opening-hours migration defined.");
+            if (oldVersion < 2) createMenuTable(db);
         }
     }
 }
