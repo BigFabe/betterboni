@@ -674,7 +674,7 @@ public class MainActivity extends Activity {
         visible.clear();
         for (Restaurant item : restaurants) {
             OpeningHours.Status open = availability.getOrDefault(item.id, OpeningHours.Status.UNKNOWN);
-            if (open == OpeningHours.Status.UNKNOWN || (!showClosed && open == OpeningHours.Status.CLOSED)) continue;
+            if (open == OpeningHours.Status.UNKNOWN || (!showClosed && query.isEmpty() && open == OpeningHours.Status.CLOSED)) continue;
             if (onlyFavorites && !favorites.contains(item.id)) continue;
             if (!item.services.containsAll(selectedServices)) continue;
             if (item.contribution < minPrice || item.contribution > maxPrice) continue;
@@ -1355,7 +1355,9 @@ public class MainActivity extends Activity {
             TextView title = text(menu[0], 16, INK, true);
             meal.addView(title);
             meal.setOnLongClickListener(v -> {
-                menuSpeaker.speak(menu[0]);
+                String spokenText = menu[0];
+                if (!menu[1].trim().isEmpty()) spokenText += ". " + menu[1].replace(" · ", ", ");
+                menuSpeaker.speak(spokenText);
                 return true;
             });
             TextView sides = text(menu[1], 13, MUTED, false);
