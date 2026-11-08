@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 final class LlmEndpoint {
+    static final String DEFAULT_URL = "https://openrouter.ai/api/v1";
+    static final String DEFAULT_MODEL = "openai/gpt-6-luna";
     final String url, model, apiKey, reasoning, targetLanguage;
 
     LlmEndpoint(String url, String model, String apiKey, String reasoning, String targetLanguage) {

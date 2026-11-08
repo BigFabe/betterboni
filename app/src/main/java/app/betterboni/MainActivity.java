@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
         translationEnabled = getPreferences(MODE_PRIVATE).getBoolean("translateMenus", true);
         allowMobileModels = getPreferences(MODE_PRIVATE).getBoolean("mobileModels", false);
         menuTranslator = new MenuTranslator(this, getPreferences(MODE_PRIVATE).getString("appLanguage", "en"));
-        translationEngine = getPreferences(MODE_PRIVATE).getString("translationEngine", "google");
+        translationEngine = getPreferences(MODE_PRIVATE).getString("translationEngine", "llm");
         configureTranslator();
         restaurantClassifier = new RestaurantClassifier(this, new RestaurantClassifier.Listener() {
             @Override public void onClassification(String id, List<RestaurantTaxonomy.Tag> labels) {
@@ -395,8 +395,8 @@ public class MainActivity extends Activity {
             refreshMenuTranslation();
         });
         LinearLayout llmForm = column();
-        llmField(llmForm, getString(R.string.endpoint_url), "https://…/v1", "llmEndpoint", false);
-        llmField(llmForm, getString(R.string.model), getString(R.string.model_id), "llmModel", false);
+        llmField(llmForm, getString(R.string.endpoint_url), LlmEndpoint.DEFAULT_URL, "llmEndpoint", false, LlmEndpoint.DEFAULT_URL);
+        llmField(llmForm, getString(R.string.model), getString(R.string.model_id), "llmModel", false, LlmEndpoint.DEFAULT_MODEL);
         LinearLayout reasoningRow = row();
         reasoningRow.addView(text(getString(R.string.reasoning), 14, INK, false), new LinearLayout.LayoutParams(0, -2, 1));
         Spinner reasoning = new Spinner(this);
@@ -456,7 +456,7 @@ public class MainActivity extends Activity {
         api.setSelection(getPreferences(MODE_PRIVATE).getString("classificationApi", "decisions").equals("chat") ? 1 : 0);
         apiRow.addView(api, new LinearLayout.LayoutParams(dp(192), dp(48)));
         classifierForm.addView(apiRow);
-        String translationUrl = getPreferences(MODE_PRIVATE).getString("llmEndpoint", "");
+        String translationUrl = getPreferences(MODE_PRIVATE).getString("llmEndpoint", LlmEndpoint.DEFAULT_URL);
         String protocol = getPreferences(MODE_PRIVATE).getString("classificationApi", "decisions");
         EditText classifierUrl = llmField(classifierForm, getString(R.string.classification_endpoint),
                 "https://…/api/alpha/decisions", "classificationEndpoint", false,
@@ -501,8 +501,8 @@ public class MainActivity extends Activity {
         try { key = EndpointSecret.load(getPreferences(MODE_PRIVATE)); }
         catch (Exception error) { Toast.makeText(this, R.string.key_read_error, Toast.LENGTH_LONG).show(); }
         menuTranslator.configure(isLlm(), new LlmEndpoint(
-                getPreferences(MODE_PRIVATE).getString("llmEndpoint", ""),
-                getPreferences(MODE_PRIVATE).getString("llmModel", ""), key,
+                getPreferences(MODE_PRIVATE).getString("llmEndpoint", LlmEndpoint.DEFAULT_URL),
+                getPreferences(MODE_PRIVATE).getString("llmModel", LlmEndpoint.DEFAULT_MODEL), key,
                 getPreferences(MODE_PRIVATE).getString("llmReasoning", ""),
                 getPreferences(MODE_PRIVATE).getString("appLanguage", "en")));
     }
@@ -511,7 +511,7 @@ public class MainActivity extends Activity {
         classificationEnabled = getPreferences(MODE_PRIVATE).getBoolean("classificationEnabled", true);
         String protocol = getPreferences(MODE_PRIVATE).getString("classificationApi", "decisions");
         String url = getPreferences(MODE_PRIVATE).getString("classificationEndpoint",
-                ClassificationEndpoint.defaultUrl(getPreferences(MODE_PRIVATE).getString("llmEndpoint", ""), protocol));
+                ClassificationEndpoint.defaultUrl(getPreferences(MODE_PRIVATE).getString("llmEndpoint", LlmEndpoint.DEFAULT_URL), protocol));
         String key = "";
         try { key = EndpointSecret.load(getPreferences(MODE_PRIVATE)); }
         catch (Exception error) { Toast.makeText(this, R.string.key_read_error, Toast.LENGTH_LONG).show(); }
